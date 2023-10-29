@@ -3,14 +3,13 @@ package red.jackf.eyespy.lies;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
-import red.jackf.jackfredlib.api.colour.Colour;
+import red.jackf.eyespy.Colours;
 import red.jackf.jackfredlib.api.lying.entity.EntityLie;
 import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
 import red.jackf.jackfredlib.api.lying.glowing.EntityGlowLie;
@@ -46,7 +45,7 @@ public class LieManager {
         ServerLevel level = player.serverLevel();
         BlockState state = level.getBlockState(pos);
 
-        var colour = Colour.fromInt(state.getBlock().defaultMapColor().col).scaleBrightness(1.25F);
+        var colour = Colours.getForBlock(state);
 
         var display = EntityBuilders.blockDisplay(level)
                                     .state(state)
@@ -68,7 +67,7 @@ public class LieManager {
     }
 
     public static void createEntity(ServerPlayer player, Entity entity) {
-        var colour = ChatFormatting.GREEN;
+        var colour = Colours.getForEntity(entity);
 
         var lie = EntityGlowLie.builder(entity)
                                .colour(colour)
