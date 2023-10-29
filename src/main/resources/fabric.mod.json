@@ -1,31 +1,30 @@
 {
 	"schemaVersion": 1,
-	"id": "modid",
+	"id": "eye-spy",
 	"version": "${version}",
-	"name": "Example mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Eye Spy",
+	"description": "Fabric & Quilt mod to enhance the spyglass",
 	"authors": [
 		"Me!"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/JackFred2/EyeSpy"
 	},
-	"license": "CC0-1.0",
-	"icon": "assets/modid/icon.png",
+	"license": "LGPL-3.0",
+	"icon": "assets/eyespy/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.example.ExampleMod"
+          "red.jackf.EyeSpy"
 		],
 		"client": [
-			"com.example.ExampleModClient"
+          "red.jackf.eyespy.client.EyeSpyClient"
 		]
 	},
 	"mixins": [
-		"modid.mixins.json",
+		"eyespy.mixins.json",
 		{
-			"config": "modid.client.mixins.json",
+			"config": "eyespy.client.mixins.json",
 			"environment": "client"
 		}
 	],
