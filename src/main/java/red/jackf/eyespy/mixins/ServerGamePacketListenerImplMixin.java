@@ -23,7 +23,7 @@ public abstract class ServerGamePacketListenerImplMixin {
     private void eyespy$handlePlayerSwap(ServerboundPlayerActionPacket packet, CallbackInfo ci) {
         if (this.player.getUseItem().is(Items.SPYGLASS)) {
             ci.cancel();
-            EyeSpy.activate(this.player, player.serverLevel());
+            EyeSpy.activate(this.player);
         }
     }
 
