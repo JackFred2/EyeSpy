@@ -130,10 +130,10 @@ dependencies {
 	modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
 
 	include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${properties["mixin_extras_version"]}")!!)!!)
-	include(implementation("commons-io:commons-io:${properties["commons_io_version"]}")!!)
+	//include(implementation("commons-io:commons-io:${properties["commons_io_version"]}")!!)
 
-	include(modImplementation("me.lucko:fabric-permissions-api:${properties["fabric_permissions_api_version"]}")!!)
-	include(modImplementation("xyz.nucleoid:server-translations-api:${properties["server_translations_api_version"]}")!!)
+	//include(modImplementation("me.lucko:fabric-permissions-api:${properties["fabric_permissions_api_version"]}")!!)
+	//include(modImplementation("xyz.nucleoid:server-translations-api:${properties["server_translations_api_version"]}")!!)
 	include(modImplementation("red.jackf.jackfredlib:jackfredlib-base:${properties["jflib_base_version"]}")!!)
 	include(modImplementation("red.jackf.jackfredlib:jackfredlib-colour:${properties["jflib_colour_version"]}")!!)
 	include(modImplementation("red.jackf.jackfredlib:jackfredlib-lying:${properties["jflib_lying_version"]}")!!)
@@ -144,7 +144,7 @@ dependencies {
 	/*modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${properties["yacl_version"]}") {
 		exclude(group = "com.terraformersmc", module = "modmenu")
 	}*/
-	include(implementation("blue.endless:jankson:${properties["jankson_version"]}")!!)
+	//include(implementation("blue.endless:jankson:${properties["jankson_version"]}")!!)
 
 	// COMPATIBILITY
 	modCompileRuntime("com.terraformersmc:modmenu:${properties["modmenu_version"]}")

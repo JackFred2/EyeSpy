@@ -15,7 +15,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-          "red.jackf.EyeSpy"
+          "red.jackf.eyespy.EyeSpy"
 		],
 		"client": [
           "red.jackf.eyespy.client.EyeSpyClient"
