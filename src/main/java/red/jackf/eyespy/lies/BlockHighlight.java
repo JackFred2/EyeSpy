@@ -9,6 +9,7 @@ import red.jackf.jackfredlib.api.lying.entity.EntityLie;
 public class BlockHighlight {
     private final ServerPlayer owner;
     private final EntityLie<Display.BlockDisplay> lie;
+    private long lastRefreshed = -1;
 
     public BlockHighlight(ServerPlayer owner, EntityLie<Display.BlockDisplay> lie) {
         this.owner = owner;
@@ -20,6 +21,11 @@ public class BlockHighlight {
     }
 
     public void refreshLifetime() {
+        this.lastRefreshed = lie.entity().level().getGameTime();
         Debris.INSTANCE.schedule(lie, EyeSpy.HIGHLIGHT_LIFETIME);
+    }
+
+    public long getLastRefreshed() {
+        return lastRefreshed;
     }
 }

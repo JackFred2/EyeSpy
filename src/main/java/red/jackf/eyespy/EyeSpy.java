@@ -39,7 +39,7 @@ public class EyeSpy implements ModInitializer {
 	private static void onBlock(ServerPlayer player, BlockHitResult blockHit) {
 		LOGGER.debug("Result: BLOCK {}", blockHit.getBlockPos().toShortString());
 
-		Sounds.playBlock(player, blockHit);
+		Sounds.playBlock(player, blockHit, player.serverLevel().getBlockState(blockHit.getBlockPos()));
 
 		var existing = LieManager.getBlockHighlight(player, blockHit.getBlockPos());
 

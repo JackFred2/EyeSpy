@@ -6,6 +6,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -13,15 +17,28 @@ import net.minecraft.world.phys.Vec3;
 public class Sounds {
     private static final int SOUND_OFFSET = 2;
     public static void playMiss(ServerPlayer player) {
-        send(player, SoundEvents.NOTE_BLOCK_BIT, player.getEyePosition(), 0.7f);
+        send(player, SoundEvents.NOTE_BLOCK_BELL, player.getEyePosition(), 0.5f);
     }
 
-    public static void playBlock(ServerPlayer player, BlockHitResult blockHit) {
-        send(player, SoundEvents.NOTE_BLOCK_BIT, towards(player.getEyePosition(), blockHit.getBlockPos().getCenter()), 1f);
+    public static void playBlock(ServerPlayer player, BlockHitResult blockHit, BlockState blockState) {
+        send(player, SoundEvents.NOTE_BLOCK_BELL, towards(player.getEyePosition(), blockHit.getBlockPos().getCenter()), getBlockPitch(blockState));
     }
 
     public static void playEntity(ServerPlayer player, EntityHitResult entityHit) {
-        send(player, SoundEvents.NOTE_BLOCK_BIT, towards(player.getEyePosition(), entityHit.getEntity().position()), 1.1f);
+        send(player, SoundEvents.NOTE_BLOCK_BELL, towards(player.getEyePosition(), entityHit.getEntity().position()), getEntityPitch(entityHit.getEntity()));
+    }
+
+    private static float getBlockPitch(BlockState state) {
+        return 2f - Mth.clamp(state.getBlock().defaultDestroyTime() / 5f, 0, 1.25f);
+    }
+
+    private static float getEntityPitch(Entity entity) {
+        if (!(entity instanceof LivingEntity living)) return 1f;
+        return 2f - Mth.clamp(living.getHealth() / 60f, 0, 1f);
+    }
+
+    private static float jitterPitch(ServerPlayer player) {
+        return (player.getRandom().nextFloat() - 0.5f) * 0.1f;
     }
 
     // Move a source vector to a target, up to a maximum distance (SOUND_OFFSET)
@@ -39,7 +56,7 @@ public class Sounds {
                 pos.y,
                 pos.z,
                 1f,
-                pitch,
+                pitch + jitterPitch(player),
                 player.getRandom().nextLong()
         ));
     }
