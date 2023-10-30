@@ -34,6 +34,14 @@ public class Sounds {
         }
     }
 
+    public static void playWarn(Collection<ServerPlayer> players, Vec3 pos) {
+        for (ServerPlayer player : players) {
+            send(player, SoundEvents.NOTE_BLOCK_PLING, towards(player.getEyePosition(), pos), 0.5f);
+        }
+    }
+
+    //--------------------------------------------------------------------
+
     private static float getBlockPitch(BlockState state) {
         return 2f - Mth.clamp(state.getBlock().defaultDestroyTime() / 5f, 0, 1.25f);
     }

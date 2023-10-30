@@ -1,7 +1,6 @@
 package red.jackf.eyespy;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.level.ServerLevel;
@@ -46,21 +45,22 @@ public class EyeSpy implements ModInitializer {
 		ServerLevel level = player.serverLevel();
 		Collection<ServerPlayer> players = PlayerLookup.tracking(level, blockHit.getBlockPos());
 
-		Sounds.playBlock(players, blockHit, level.getBlockState(blockHit.getBlockPos()));
-
 		var existing = LieManager.getBlockHighlight(blockHit.getBlockPos());
 
 		if (existing.isPresent()) {
 			if (player.level().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
 				existing.get().lie().fade();
+				Sounds.playWarn(players, blockHit.getBlockPos().getCenter());
 				LieManager.createBlock(level, players, blockHit.getBlockPos(), true);
 			} else {
+				Sounds.playBlock(players, blockHit, level.getBlockState(blockHit.getBlockPos()));
 				existing.get().refreshLifetime();
 			}
 
 			return;
 		}
 
+		Sounds.playBlock(players, blockHit, level.getBlockState(blockHit.getBlockPos()));
 		LieManager.createBlock(level, players, blockHit.getBlockPos(), false);
 	}
 
@@ -70,33 +70,26 @@ public class EyeSpy implements ModInitializer {
 		ServerLevel level = player.serverLevel();
 		Collection<ServerPlayer> players = PlayerLookup.tracking(entityHit.getEntity());
 
-		Sounds.playEntity(players, entityHit);
-
 		var existing = LieManager.getEntityHighlight(entityHit.getEntity());
 
 		if (existing.isPresent()) {
 			if (player.level().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
 				existing.get().lie().fade();
+				Sounds.playWarn(players, entityHit.getEntity().getEyePosition());
 				LieManager.createEntity(level, players, entityHit.getEntity(), true);
 			} else {
+				Sounds.playEntity(players, entityHit);
 				existing.get().refreshLifetime();
 			}
-
 			return;
 		}
 
+		Sounds.playEntity(players, entityHit);
 		LieManager.createEntity(level, players, entityHit.getEntity(), false);
 	}
 
 	@Override
 	public void onInitialize() {
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> LieManager.fadeEverything(handler.player));
-
-		ServerTickEvents.END_WORLD_TICK.register(level -> {
-			if (level.getGameTime() % 200 == 0) {
-				LOGGER.info("BLOCKS {}", LieManager.BLOCKS.size());
-				LOGGER.info("ENTITIES {}", LieManager.ENTITIES.size());
-			}
-		});
 	}
 }
