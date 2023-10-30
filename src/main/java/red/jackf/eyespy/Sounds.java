@@ -14,18 +14,24 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Collection;
+
 public class Sounds {
     private static final int SOUND_OFFSET = 2;
     public static void playMiss(ServerPlayer player) {
         send(player, SoundEvents.NOTE_BLOCK_BELL, player.getEyePosition(), 0.5f);
     }
 
-    public static void playBlock(ServerPlayer player, BlockHitResult blockHit, BlockState blockState) {
-        send(player, SoundEvents.NOTE_BLOCK_BELL, towards(player.getEyePosition(), blockHit.getBlockPos().getCenter()), getBlockPitch(blockState));
+    public static void playBlock(Collection<ServerPlayer> players, BlockHitResult blockHit, BlockState blockState) {
+        for (ServerPlayer player : players) {
+            send(player, SoundEvents.NOTE_BLOCK_BELL, towards(player.getEyePosition(), blockHit.getBlockPos().getCenter()), getBlockPitch(blockState));
+        }
     }
 
-    public static void playEntity(ServerPlayer player, EntityHitResult entityHit) {
-        send(player, SoundEvents.NOTE_BLOCK_BELL, towards(player.getEyePosition(), entityHit.getEntity().position()), getEntityPitch(entityHit.getEntity()));
+    public static void playEntity(Collection<ServerPlayer> players, EntityHitResult entityHit) {
+        for (ServerPlayer player : players) {
+            send(player, SoundEvents.NOTE_BLOCK_BELL, towards(player.getEyePosition(), entityHit.getEntity().position()), getEntityPitch(entityHit.getEntity()));
+        }
     }
 
     private static float getBlockPitch(BlockState state) {

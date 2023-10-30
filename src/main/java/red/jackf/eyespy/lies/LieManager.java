@@ -1,8 +1,5 @@
 package red.jackf.eyespy.lies;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -16,35 +13,33 @@ import red.jackf.jackfredlib.api.lying.entity.EntityLie;
 import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
 import red.jackf.jackfredlib.api.lying.glowing.EntityGlowLie;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class LieManager {
-    private static final Multimap<GameProfile, BlockHighlight> BLOCKS =
-            MultimapBuilder.hashKeys().hashSetValues().build();
-    private static final Multimap<GameProfile, EntityHighlight> ENTITIES =
-            MultimapBuilder.hashKeys().hashSetValues().build();
+    public static final Map<BlockPos, BlockHighlight> BLOCKS = new HashMap<>();
+    public static final Map<Entity, EntityHighlight> ENTITIES = new HashMap<>();
 
-    public static Optional<BlockHighlight> getBlockHighlight(ServerPlayer player, BlockPos pos) {
-        return BLOCKS.get(player.getGameProfile())
-                     .stream()
-                     .filter(holder -> holder.lie().entity().blockPosition().equals(pos))
-                     .findFirst();
+    public static Optional<BlockHighlight> getBlockHighlight(BlockPos pos) {
+        return Optional.ofNullable(BLOCKS.get(pos));
     }
 
-    public static Optional<EntityHighlight> getEntityHighlight(ServerPlayer player, Entity entity) {
-        return ENTITIES.get(player.getGameProfile())
-                       .stream()
-                       .filter(holder -> holder.lie().entity() == entity)
-                       .findFirst();
+    public static Optional<EntityHighlight> getEntityHighlight(Entity entity) {
+        return Optional.ofNullable(ENTITIES.get(entity));
     }
 
     public static void fadeEverything(ServerPlayer player) {
-        BLOCKS.removeAll(player.getGameProfile()).forEach(highlight -> highlight.lie().fade());
-        ENTITIES.removeAll(player.getGameProfile()).forEach(highlight -> highlight.lie().fade());
+        BLOCKS.values().stream()
+              .filter(highlight -> highlight.lie().getViewingPlayers().contains(player))
+              .forEach(highlight -> highlight.lie().removePlayer(player));
+        ENTITIES.values().stream()
+              .filter(highlight -> highlight.lie().getViewingPlayers().contains(player))
+              .forEach(highlight -> highlight.lie().removePlayer(player));
     }
 
-    public static void createBlock(ServerPlayer player, BlockPos pos, boolean flashRed) {
-        ServerLevel level = player.serverLevel();
+    public static void createBlock(ServerLevel level, Collection<ServerPlayer> players, BlockPos pos, boolean flashRed) {
         BlockState state = level.getBlockState(pos);
 
         boolean startGlowing = !flashRed || getCurrentColour(level) != null;
@@ -62,27 +57,27 @@ public class LieManager {
         var lie = EntityLie.builder(display)
                            .onFade(LieManager::onBlockFade)
                            .onTick(flashRed ? LieManager::flashRed : null)
-                           .createAndShow(player);
+                           .createAndShow(players);
 
         var holder = new BlockHighlight(lie);
         holder.refreshLifetime();
 
-        BLOCKS.put(player.getGameProfile(), holder);
+        BLOCKS.put(pos, holder);
     }
 
-    public static void createEntity(ServerPlayer player, Entity entity, boolean flashRed) {
-        var colour = flashRed ? getCurrentColour(player.serverLevel()) : Colours.getForEntity(entity);
+    public static void createEntity(ServerLevel level, Collection<ServerPlayer> players, Entity entity, boolean flashRed) {
+        var colour = flashRed ? getCurrentColour(level) : Colours.getForEntity(entity);
 
         var lie = EntityGlowLie.builder(entity)
                                .colour(colour)
                                .onFade(LieManager::onEntityFade)
                                .onTick(flashRed ? LieManager::flashRed : null)
-                               .createAndShow(player);
+                               .createAndShow(players);
 
         var holder = new EntityHighlight(lie);
         holder.refreshLifetime();
 
-        ENTITIES.put(player.getGameProfile(), holder);
+        ENTITIES.put(entity, holder);
     }
 
     private static @Nullable ChatFormatting getCurrentColour(ServerLevel level) {
@@ -101,11 +96,13 @@ public class LieManager {
         lie.setGlowColour(getCurrentColour(player.serverLevel()));
     }
 
-    private static void onBlockFade(ServerPlayer player, EntityLie<Display.BlockDisplay> lie) {
-        BLOCKS.get(player.getGameProfile()).removeIf(highlight -> highlight.lie() == lie);
+    private static void onBlockFade(ServerPlayer ignored, EntityLie<Display.BlockDisplay> lie) {
+        if (lie.hasFaded())
+            BLOCKS.values().removeIf(highlight -> highlight.lie() == lie);
     }
 
-    private static void onEntityFade(ServerPlayer player, EntityGlowLie<? extends Entity> lie) {
-        ENTITIES.get(player.getGameProfile()).removeIf(highlight -> highlight.lie() == lie);
+    private static void onEntityFade(ServerPlayer ignored, EntityGlowLie<? extends Entity> lie) {
+        if (lie.hasFaded())
+            ENTITIES.values().removeIf(highlight -> highlight.lie() == lie);
     }
 }
