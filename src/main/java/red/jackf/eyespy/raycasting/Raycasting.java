@@ -1,11 +1,11 @@
-package red.jackf.eyespy;
+package red.jackf.eyespy.raycasting;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.*;
+import red.jackf.eyespy.EyeSpy;
 
 import java.util.Optional;
 
@@ -49,13 +49,10 @@ public class Raycasting {
     }
 
     private static BlockHitResult pick(ServerPlayer player, double maxDistance) {
-        Vec3 vec3 = player.getEyePosition();
-        Vec3 vec32 = player.getViewVector(0);
-        Vec3 vec33 = vec3.add(vec32.x * maxDistance, vec32.y * maxDistance, vec32.z * maxDistance);
+        Vec3 from = player.getEyePosition();
+        Vec3 direction = player.getViewVector(1);
+        Vec3 to = from.add(direction.x * maxDistance, direction.y * maxDistance, direction.z * maxDistance);
 
-        ClipContext.Block blockHit = ClipContext.Block.VISUAL;
-        ClipContext.Fluid fluidHit = ClipContext.Fluid.NONE;
-
-        return player.level().clip(new ClipContext(vec3, vec33, blockHit, fluidHit, player));
+        return player.level().clip(new CustomClipContext(from, to, player));
     }
 }

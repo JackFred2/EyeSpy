@@ -8,10 +8,13 @@ import net.minecraft.world.entity.Saddleable;
 import net.minecraft.world.entity.npc.Npc;
 import net.minecraft.world.level.block.state.BlockState;
 import red.jackf.jackfredlib.api.colour.Colour;
+import red.jackf.jackfredlib.api.colour.Colours;
 
 import java.util.Set;
 
-public class Colours {
+import static red.jackf.jackfredlib.api.colour.Colour.fromInt;
+
+public class HighlightColours {
     private static final ChatFormatting HOSTILE = ChatFormatting.RED;
     private static final ChatFormatting VILLAGE = ChatFormatting.LIGHT_PURPLE;
     private static final ChatFormatting FRIENDLY = ChatFormatting.GREEN;
@@ -52,6 +55,6 @@ public class Colours {
     }
 
     public static Colour getForBlock(BlockState state) {
-        return Colour.fromInt(state.getBlock().defaultMapColor().col).scaleBrightness(1.5f);
+        return fromInt(state.getBlock().defaultMapColor().col).lerp(Colours.WHITE, .25f);
     }
 }

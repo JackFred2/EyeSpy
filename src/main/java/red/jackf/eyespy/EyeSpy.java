@@ -14,6 +14,7 @@ import red.jackf.eyespy.config.EyeSpyConfig;
 import red.jackf.eyespy.config.EyeSpyConfigMigrator;
 import red.jackf.eyespy.lies.Constants;
 import red.jackf.eyespy.lies.LieManager;
+import red.jackf.eyespy.raycasting.Raycasting;
 import red.jackf.jackfredlib.api.config.ConfigHandler;
 
 import java.util.Collection;
