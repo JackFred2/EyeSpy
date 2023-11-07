@@ -10,8 +10,11 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import red.jackf.eyespy.config.EyeSpyConfig;
+import red.jackf.eyespy.config.EyeSpyConfigMigrator;
 import red.jackf.eyespy.lies.Constants;
 import red.jackf.eyespy.lies.LieManager;
+import red.jackf.jackfredlib.api.config.ConfigHandler;
 
 import java.util.Collection;
 
@@ -20,6 +23,14 @@ public class EyeSpy implements ModInitializer {
 		return LoggerFactory.getLogger("red.jackf.eyespy.Eye Spy" + (suffix.isBlank() ? "" : "/" + suffix));
 	}
     public static final Logger LOGGER = getLogger("");
+	public static final String MODID = "eye-spy";
+
+	public static final ConfigHandler<EyeSpyConfig> CONFIG = ConfigHandler.builder(EyeSpyConfig.class)
+			.fileName(MODID)
+			.withLogger(getLogger("Config"))
+			.withMigrator(EyeSpyConfigMigrator.get())
+			.withFileWatcher()
+			.build();
 
 	public static void activate(ServerPlayer player) {
 		LOGGER.debug("Ping from {}", player.getName().getString());
@@ -43,7 +54,7 @@ public class EyeSpy implements ModInitializer {
 		LOGGER.debug("Result: BLOCK {}", blockHit.getBlockPos().toShortString());
 
 		ServerLevel level = player.serverLevel();
-		Collection<ServerPlayer> players = PlayerLookup.tracking(level, blockHit.getBlockPos());
+		Collection<ServerPlayer> players = PlayerLookup.around(level, player.getEyePosition(), EyeSpy.CONFIG.instance().ping.notifyRangeBlocks);
 
 		var existing = LieManager.getBlockHighlight(blockHit.getBlockPos());
 
@@ -90,6 +101,7 @@ public class EyeSpy implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		CONFIG.load();
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> LieManager.fadeEverything(handler.player));
 	}
 }

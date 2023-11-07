@@ -21,9 +21,17 @@ public abstract class ServerGamePacketListenerImplMixin {
                     target = "Lnet/minecraft/server/level/ServerPlayer;isSpectator()Z"),
             cancellable = true)
     private void eyespy$handlePlayerSwap(ServerboundPlayerActionPacket packet, CallbackInfo ci) {
-        if (this.player.getUseItem().is(Items.SPYGLASS)) {
-            ci.cancel();
-            EyeSpy.activate(this.player);
+        if (!EyeSpy.CONFIG.instance().ping.enabled) return;
+        if (EyeSpy.CONFIG.instance().ping.requiresZoomIn) {
+            if (this.player.getUseItem().is(Items.SPYGLASS)) {
+                ci.cancel();
+                EyeSpy.activate(this.player);
+            }
+        } else {
+            if (this.player.getMainHandItem().is(Items.SPYGLASS) || this.player.getOffhandItem().is(Items.SPYGLASS)) {
+                ci.cancel();
+                EyeSpy.activate(this.player);
+            }
         }
     }
 

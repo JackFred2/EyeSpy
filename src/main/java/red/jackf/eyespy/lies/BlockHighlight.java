@@ -1,6 +1,7 @@
 package red.jackf.eyespy.lies;
 
 import net.minecraft.world.entity.Display;
+import red.jackf.eyespy.EyeSpy;
 import red.jackf.jackfredlib.api.lying.Debris;
 import red.jackf.jackfredlib.api.lying.entity.EntityLie;
 
@@ -18,7 +19,7 @@ public class BlockHighlight {
 
     public void refreshLifetime() {
         this.lastRefreshed = lie.entity().level().getGameTime();
-        Debris.INSTANCE.schedule(lie, Constants.HIGHLIGHT_LIFETIME);
+        Debris.INSTANCE.schedule(lie, EyeSpy.CONFIG.instance().ping.lifetimeTicks);
     }
 
     public long getLastRefreshed() {
