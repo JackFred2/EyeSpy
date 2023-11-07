@@ -24,7 +24,7 @@ public class Raycasting {
     }
 
     private static Optional<EntityHitResult> tryEntity(ServerPlayer player) {
-        final double maxDistance = EyeSpy.CONFIG.instance().ping.maxRangeBlocks;
+        final double maxDistance = EyeSpy.CONFIG.instance().maxRangeBlocks;
 
         Vec3 start = player.getEyePosition(1f);
         Vec3 offset = player.getViewVector(1f).scale(maxDistance);
@@ -45,7 +45,7 @@ public class Raycasting {
     }
 
     private static BlockHitResult tryBlock(ServerPlayer player) {
-        return pick(player, EyeSpy.CONFIG.instance().ping.maxRangeBlocks);
+        return pick(player, EyeSpy.CONFIG.instance().maxRangeBlocks);
     }
 
     private static BlockHitResult pick(ServerPlayer player, double maxDistance) {

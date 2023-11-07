@@ -5,6 +5,12 @@ import net.minecraft.util.Mth;
 import red.jackf.jackfredlib.api.config.Config;
 
 public class EyeSpyConfig implements Config<EyeSpyConfig> {
+    @Comment("""
+                Maximum range that pings and rangefinding will function at. This is capped by the world / server's render
+                distance.
+                Range: [16, 384]
+                Default: 256""")
+    public int maxRangeBlocks = 256;
 
     @Comment("""
             Settings related to the pinging function added to spyglasses - to use, press the swap hands key,
@@ -26,12 +32,6 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         public boolean requiresZoomIn = true;
 
         @Comment("""
-                Maximum range that the pings will function at. This is capped by the world / server's render distance.
-                Range: [16, 384]
-                Default: 256""")
-        public int maxRangeBlocks = 256;
-
-        @Comment("""
                 Maximum range of nearby players that will recieve the ping highlight and sound.
                 Range: [8, 256]
                 Default: 64""")
@@ -46,7 +46,7 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
 
     @Override
     public void validate() {
-        this.ping.maxRangeBlocks = Mth.clamp(this.ping.maxRangeBlocks, 16, 384);
+        this.maxRangeBlocks = Mth.clamp(this.maxRangeBlocks, 16, 384);
         this.ping.notifyRangeBlocks = Mth.clamp(this.ping.notifyRangeBlocks, 8, 256);
         this.ping.lifetimeTicks = Mth.clamp(this.ping.lifetimeTicks, 60, 400);
     }

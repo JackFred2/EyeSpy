@@ -13,7 +13,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Custom clip context used to have custom ray functions
+ * Custom clip context used to have custom ray functions outside of the Block enum
  */
 public class CustomClipContext extends ClipContext {
     public CustomClipContext(
