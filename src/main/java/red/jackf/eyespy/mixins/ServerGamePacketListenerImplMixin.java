@@ -18,7 +18,9 @@ public abstract class ServerGamePacketListenerImplMixin {
 
     @Inject(method = "handlePlayerAction",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerPlayer;isSpectator()Z"),
+                    target = "Lnet/minecraft/server/level/ServerPlayer;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;",
+                    shift = At.Shift.AFTER,
+                    ordinal = 0),
             cancellable = true)
     private void eyespy$handlePlayerSwap(ServerboundPlayerActionPacket packet, CallbackInfo ci) {
         if (!EyeSpy.CONFIG.instance().ping.enabled) return;
