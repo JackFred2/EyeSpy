@@ -44,6 +44,34 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         public int lifetimeTicks = 160;
     }
 
+    public Rangefinder rangefinder = new Rangefinder();
+
+    public static class Rangefinder {
+        @Comment("""
+                Whether to enable rangefinding functionality for spyglasses.
+                Options: true, false
+                Default: true""")
+        public boolean enabled = true;
+
+        @Comment("""
+                Whether to use highlight colours for labels when looking at entities or blocks.
+                Options: true, false
+                Default: true""")
+        public boolean useColours = true;
+
+        @Comment("""
+                Whether to show the name of the block being looked at, if applicable.
+                Options: true, false
+                Default: true""")
+        public boolean showBlockName = true;
+
+        @Comment("""
+                Whether to show the name of the entity being looked at, if applicable.
+                Options: true, false
+                Default: true""")
+        public boolean showEntityName = true;
+    }
+
     @Override
     public void validate() {
         this.maxRangeBlocks = Mth.clamp(this.maxRangeBlocks, 16, 384);

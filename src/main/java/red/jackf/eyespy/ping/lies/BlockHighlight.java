@@ -1,4 +1,4 @@
-package red.jackf.eyespy.lies;
+package red.jackf.eyespy.ping.lies;
 
 import net.minecraft.world.entity.Display;
 import red.jackf.eyespy.EyeSpy;

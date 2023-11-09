@@ -3,6 +3,7 @@
   "package": "red.jackf.eyespy.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "EyeSpyEntityInvoker",
     "ServerGamePacketListenerImplMixin"
   ],
   "injectors": {

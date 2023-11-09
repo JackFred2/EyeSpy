@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import red.jackf.eyespy.EyeSpy;
+import red.jackf.eyespy.ping.Ping;
 
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class ServerGamePacketListenerImplMixin {
@@ -27,12 +28,12 @@ public abstract class ServerGamePacketListenerImplMixin {
         if (EyeSpy.CONFIG.instance().ping.requiresZoomIn) {
             if (this.player.getUseItem().is(Items.SPYGLASS)) {
                 ci.cancel();
-                EyeSpy.activate(this.player);
+                Ping.activate(this.player);
             }
         } else {
             if (this.player.getMainHandItem().is(Items.SPYGLASS) || this.player.getOffhandItem().is(Items.SPYGLASS)) {
                 ci.cancel();
-                EyeSpy.activate(this.player);
+                Ping.activate(this.player);
             }
         }
     }

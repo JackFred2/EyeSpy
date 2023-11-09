@@ -1,4 +1,4 @@
-package red.jackf.eyespy;
+package red.jackf.eyespy.ping;
 
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;

@@ -1,4 +1,4 @@
-package red.jackf.eyespy.lies;
+package red.jackf.eyespy.ping.lies;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -8,7 +8,7 @@ import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import red.jackf.eyespy.HighlightColours;
+import red.jackf.eyespy.EyeSpyColours;
 import red.jackf.jackfredlib.api.lying.entity.EntityLie;
 import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
 import red.jackf.jackfredlib.api.lying.glowing.EntityGlowLie;
@@ -51,7 +51,7 @@ public class LieManager {
                                     .scaleAndCenter(0.98f)
                                     .brightness(15, 15)
                                     .viewRangeModifier(5f)
-                                    .glowing(startGlowing, flashRed ? ChatFormatting.RED.getColor() : HighlightColours.getForBlock(state).toARGB())
+                                    .glowing(startGlowing, flashRed ? ChatFormatting.RED.getColor() : EyeSpyColours.getForBlock(state).toARGB())
                                     .build();
 
         var lie = EntityLie.builder(display)
@@ -66,7 +66,7 @@ public class LieManager {
     }
 
     public static void createEntity(ServerLevel level, Collection<ServerPlayer> players, Entity entity, boolean flashRed) {
-        var colour = flashRed ? getCurrentColour(level) : HighlightColours.getForEntity(entity);
+        var colour = flashRed ? getCurrentColour(level) : EyeSpyColours.getForEntity(entity);
 
         var lie = EntityGlowLie.builder(entity)
                                .colour(colour)
