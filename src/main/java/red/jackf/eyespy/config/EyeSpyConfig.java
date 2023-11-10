@@ -44,6 +44,9 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         public int lifetimeTicks = 160;
     }
 
+    @Comment("""
+            Settings related to the rangefinding feature added to spyglasses - when looking at a block, or entity, the
+            distance will be displayed, as well as their names.""")
     public Rangefinder rangefinder = new Rangefinder();
 
     public static class Rangefinder {
