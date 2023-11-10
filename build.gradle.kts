@@ -218,7 +218,7 @@ if (lastTagVal != null && newTagVal != null) {
 	tasks.named<DefaultTask>("publishMods") {
 		dependsOn(generateChangelogTask)
 	}
-	/*
+
 	if (listOf("CURSEFORGE_TOKEN", "MODRINTH_TOKEN").any { System.getenv().containsKey(it) }) {
 		publishMods {
 			changelog.set(provider {
@@ -232,7 +232,7 @@ if (lastTagVal != null && newTagVal != null) {
 
 			if (System.getenv().containsKey("CURSEFORGE_TOKEN") || dryRun.get()) {
 				curseforge {
-					projectId.set("506536")
+					projectId.set("935678")
 					accessToken.set(System.getenv("CURSEFORGE_TOKEN"))
 					properties["game_versions"]!!.toString().split(",").forEach {
 						minecraftVersions.add(it)
@@ -254,7 +254,7 @@ if (lastTagVal != null && newTagVal != null) {
 			if (System.getenv().containsKey("MODRINTH_TOKEN") || dryRun.get()) {
 				modrinth {
 					accessToken.set(System.getenv("MODRINTH_TOKEN"))
-					projectId.set("Bfi1KBJV")
+					projectId.set("fZqxffZK")
 					properties["game_versions"]!!.toString().split(",").forEach {
 						minecraftVersions.add(it)
 					}
@@ -267,7 +267,7 @@ if (lastTagVal != null && newTagVal != null) {
 				}
 			}
 		}
-	}*/
+	}
 }
 
 // configure the maven publication
