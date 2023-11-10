@@ -7,11 +7,11 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.Saddleable;
 import net.minecraft.world.entity.npc.Npc;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.MapColor;
 import red.jackf.jackfredlib.api.colour.Colour;
+import red.jackf.jackfredlib.api.colour.Colours;
 
 import java.util.Set;
-
-import static red.jackf.jackfredlib.api.colour.Colour.fromInt;
 
 public class EyeSpyColours {
     private static final ChatFormatting HOSTILE = ChatFormatting.RED;
@@ -54,6 +54,8 @@ public class EyeSpyColours {
     }
 
     public static Colour getForBlock(BlockState state) {
-        return fromInt(state.getBlock().defaultMapColor().col).lerp(red.jackf.jackfredlib.api.colour.Colours.WHITE, .25f);
+        MapColor mapColor = state.getBlock().defaultMapColor();
+        Colour colour = mapColor == MapColor.NONE ? Colours.WHITE : Colour.fromInt(mapColor.col);
+        return colour.lerp(Colours.WHITE, .25f);
     }
 }
