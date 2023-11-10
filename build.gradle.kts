@@ -114,10 +114,9 @@ loom {
 	//accessWidenerPath.set(file("src/main/resources/lenientdeath.accesswidener"))
 }
 
-// from WTHIT
 fun DependencyHandlerScope.modCompileRuntime(any: String, configure: ExternalModuleDependency.() -> Unit = {}) {
 	modCompileOnly(any, configure)
-	modRuntimeOnly(any, configure)
+	modLocalRuntime(any, configure)
 }
 
 dependencies {
