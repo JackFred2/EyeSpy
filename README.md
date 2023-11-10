@@ -11,7 +11,7 @@ by operators, or by changing the config file `config/eyespy.json5`.
 
 ![A GIF showing the player pinging blocks and entities, with a flashing hazard ping on a creeper.](https://i.imgur.com/HgB8rsS.gif)
 
-Players can now ping blocks and entities with the spyglass using a hijacked 'Swap Item with Offhand' keybind. This shows a glowing outline to them
+Players can now ping blocks and entities with the spyglass using a hijacked 'Swap Item with Offhand' keybind, default `F`. This shows a glowing outline to them
 and surrounding players. They can also double-tap they key to show a flashing red hazard ping.
 
 For more details, see the [Wiki Page](https://github.com/JackFred2/EyeSpy/wiki/Ping).

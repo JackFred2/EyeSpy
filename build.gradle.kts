@@ -114,6 +114,7 @@ loom {
 	//accessWidenerPath.set(file("src/main/resources/lenientdeath.accesswidener"))
 }
 
+// require for local compile + running, but not for dependencies of this project
 fun DependencyHandlerScope.modCompileRuntime(any: String, configure: ExternalModuleDependency.() -> Unit = {}) {
 	modCompileOnly(any, configure)
 	modLocalRuntime(any, configure)
@@ -223,7 +224,7 @@ if (lastTagVal != null && newTagVal != null) {
 			changelog.set(provider {
 				return@provider generateChangelogTask.get().changelogFile.get().asFile.readText()
 			})
-			type.set(ReleaseType.STABLE)
+			type.set(ReleaseType.BETA)
 			modLoaders.add("fabric")
 			modLoaders.add("quilt")
 			file.set(tasks.named<RemapJarTask>("remapJar").get().archiveFile)
