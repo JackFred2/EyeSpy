@@ -16,8 +16,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import red.jackf.eyespy.EyeSpy;
-import red.jackf.eyespy.mixins.EyeSpyEntityInvoker;
 import red.jackf.eyespy.EyeSpyColours;
+import red.jackf.eyespy.mixins.EyeSpyEntityInvoker;
 import red.jackf.eyespy.raycasting.Raycasting;
 import red.jackf.jackfredlib.api.lying.entity.EntityLie;
 import red.jackf.jackfredlib.api.lying.entity.EntityUtils;
@@ -25,6 +25,7 @@ import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
 
 public class RangefindLie {
     private static final float ENTITY_DISTANCE = 8f;
+    private static final float ENTITY_DISTANCE_SQR = ENTITY_DISTANCE * ENTITY_DISTANCE;
     private static final float SCALE = 0.12f;
     private static final float OFFSET = 0.75f;
 
@@ -68,6 +69,11 @@ public class RangefindLie {
                     case ENTITY -> makeEntityText((EntityHitResult) hit);
                 };
 
+                EntityUtils.setDisplayTextSeeThrough(
+                        this.lie.entity(),
+                        hit.getLocation().distanceToSqr(this.player.getEyePosition()) < ENTITY_DISTANCE_SQR
+                );
+
                 EntityUtils.setDisplayText(this.lie.entity(), text);
             }
         }
@@ -98,10 +104,10 @@ public class RangefindLie {
 
         if (hit.getEntity().hasCustomName()) {
             name = Component.literal("").setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE))
-                    .append(hit.getEntity().getCustomName())
-                    .append(" (")
-                    .append(name)
-                    .append(")");
+                            .append(hit.getEntity().getCustomName())
+                            .append(" (")
+                            .append(name)
+                            .append(")");
         }
         return makeDistanceText(hit)
                 .append(CommonComponents.NEW_LINE)
