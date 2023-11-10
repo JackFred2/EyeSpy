@@ -1,5 +1,6 @@
 {
   "eyespy.title": "Eye Spy",
+  "eyespy.rangefinder.outOfRange": "Out of range",
   "eyespy.command.config.clickToOpenWiki": "Click to open the wiki page for this option",
   "eyespy.command.config.check": "%s: %s",
   "eyespy.command.config.change": "%s: %s -> %s",

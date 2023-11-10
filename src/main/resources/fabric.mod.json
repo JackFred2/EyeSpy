@@ -19,11 +19,7 @@
 		]
 	},
 	"mixins": [
-		"eyespy.mixins.json",
-		{
-			"config": "eyespy.client.mixins.json",
-			"environment": "client"
-		}
+		"eyespy.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.14.22",

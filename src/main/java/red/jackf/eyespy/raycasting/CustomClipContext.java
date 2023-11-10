@@ -16,11 +16,13 @@ import org.jetbrains.annotations.NotNull;
  * Custom clip context used to have custom ray functions outside of the Block enum
  */
 public class CustomClipContext extends ClipContext {
+
     public CustomClipContext(
             Vec3 from,
             Vec3 to,
-            Entity entity) {
-        super(from, to, Block.OUTLINE, Fluid.NONE, entity);
+            Entity entity,
+            boolean hitFluids) {
+        super(from, to, Block.OUTLINE, hitFluids ? Fluid.ANY : Fluid.NONE, entity);
     }
 
     @Override
