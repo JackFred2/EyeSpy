@@ -7,9 +7,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import red.jackf.eyespy.EyeSpy;
 
-/**
- * Tracks who is currently using a spyglass
- */
 public class Rangefinder {
     public static void setup() {
         UseItemCallback.EVENT.register((player, level, hand) -> {

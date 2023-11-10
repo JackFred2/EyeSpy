@@ -16,9 +16,6 @@
 	"entrypoints": {
 		"main": [
           "red.jackf.eyespy.EyeSpy"
-		],
-		"client": [
-          "red.jackf.eyespy.client.EyeSpyClient"
 		]
 	},
 	"mixins": [
