@@ -1,6 +1,6 @@
 {
 	"schemaVersion": 1,
-	"id": "eye-spy",
+	"id": "eyespy",
 	"version": "${version}",
 	"name": "Eye Spy",
 	"description": "Fabric & Quilt mod to enhance the spyglass",

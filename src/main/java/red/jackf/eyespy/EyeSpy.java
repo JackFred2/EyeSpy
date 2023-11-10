@@ -17,7 +17,7 @@ public class EyeSpy implements ModInitializer {
 		return LoggerFactory.getLogger("red.jackf.eyespy.Eye Spy" + (suffix.isBlank() ? "" : "/" + suffix));
 	}
     public static final Logger LOGGER = getLogger("");
-	public static final String MODID = "eye-spy";
+	public static final String MODID = "eyespy";
 
 	public static final ConfigHandler<EyeSpyConfig> CONFIG = ConfigHandler.builder(EyeSpyConfig.class)
 			.fileName(MODID)
