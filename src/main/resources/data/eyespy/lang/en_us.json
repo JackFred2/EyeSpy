@@ -1,0 +1,7 @@
+{
+  "eyespy.title": "Eye Spy",
+  "eyespy.command.config.clickToOpenWiki": "Click to open the wiki page for this option",
+  "eyespy.command.config.check": "%s: %s",
+  "eyespy.command.config.change": "%s: %s -> %s",
+  "eyespy.command.config.unchanged": "%s: %s (unchanged)"
+}
