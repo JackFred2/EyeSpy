@@ -15,6 +15,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import red.jackf.eyespy.EyeSpy;
 import red.jackf.eyespy.EyeSpyColours;
@@ -123,19 +125,27 @@ public class RangefindLie {
 
         Vec3 thisTickOffset = this.player.getEyePosition().add(this.player.getLookAngle().scale(distance)).subtract(this.lie.entity().position());
 
-        Vector3f scaleOffset = new Vector3f(0, scaleFactorRelativeToMax * -SCALE * OFFSET, 0);
+        Vector3f translate = thisTickOffset.toVector3f().add(new Vector3f(0, scaleFactorRelativeToMax * -SCALE * OFFSET, 0));
 
         EntityUtils.updateDisplayTransformation(this.lie.entity(),
-                                                thisTickOffset.toVector3f().add(scaleOffset),
+                                                translate,
                                                 null,
                                                 new Vector3f(scaleFactorRelativeToMax * SCALE),
-                                                null
+                                                makeRotation()
         );
 
         boolean changed = thisTickOffset.subtract(this.lastTickOffset).length() > 0.001;
 
         if (changed) EntityUtils.startInterpolationIn(this.lie.entity(), 0);
         this.lastTickOffset = thisTickOffset;
+    }
+
+    // not kept up on my quaternion lore so this may not be the most efficient
+    private Quaternionf makeRotation() {
+        Quaternionf yRot = new Quaternionf(new AxisAngle4f((float) (Math.PI + Math.toRadians(-this.player.getYHeadRot())), 0, 1, 0));
+        Quaternionf xRot = new Quaternionf(new AxisAngle4f((float) Math.toRadians(-this.player.getXRot()), 1, 0, 0));
+
+        return yRot.mul(xRot);
     }
 
     public static void create(ServerPlayer player) {
