@@ -41,7 +41,6 @@ public class RangefindLie {
                                                    .seeThrough(false)
                                                    .textAlign(Display.TextDisplay.Align.CENTER)
                                                    .brightness(15, 15)
-                                                   .teleportInterpolationDuration(1)
                                                    .position(player.getEyePosition().add(player.getLookAngle().scale(MAX_DISTANCE)))
                                                    .build())
                             .onTick(this::tickLie)
