@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import red.jackf.eyespy.EyeSpy;
 import red.jackf.eyespy.EyeSpyColours;
@@ -32,6 +33,7 @@ public class RangefindLie {
 
     private final ServerPlayer player;
     private final EntityLie<Display.TextDisplay> lie;
+    private Vec3 lastTickOffset;
 
     private RangefindLie(ServerPlayer player) {
         this.player = player;
@@ -40,12 +42,13 @@ public class RangefindLie {
                                                    .backgroundColour(0x80, 0x00, 0x00, 0x00)
                                                    .seeThrough(false)
                                                    .textAlign(Display.TextDisplay.Align.CENTER)
+                                                   .transformInterpolationDuration(1)
                                                    .brightness(15, 15)
-                                                   .position(player.getEyePosition().add(player.getLookAngle().scale(MAX_DISTANCE)))
+                                                   .position(player.getEyePosition())
                                                    .build())
                             .onTick(this::tickLie)
                             .createAndShow(player);
-
+        this.lastTickOffset = player.getEyePosition().add(player.getLookAngle().scale(MAX_DISTANCE));
         this.refreshPosAngleAndScale();
     }
 
@@ -118,14 +121,21 @@ public class RangefindLie {
         float distance = Mth.clamp(collisionDistance / 2, 0.1f, MAX_DISTANCE);
         float scaleFactorRelativeToMax = distance / MAX_DISTANCE;
 
-        this.lie.entity().setPos(this.player.getEyePosition().add(this.player.getLookAngle().scale(distance)));
+        Vec3 thisTickOffset = this.player.getEyePosition().add(this.player.getLookAngle().scale(distance)).subtract(this.lie.entity().position());
+
+        Vector3f scaleOffset = new Vector3f(0, scaleFactorRelativeToMax * -SCALE * OFFSET, 0);
+
         EntityUtils.updateDisplayTransformation(this.lie.entity(),
-                                                new Vector3f(0, scaleFactorRelativeToMax * -SCALE * OFFSET, 0),
+                                                thisTickOffset.toVector3f().add(scaleOffset),
                                                 null,
                                                 new Vector3f(scaleFactorRelativeToMax * SCALE),
                                                 null
         );
-        EntityUtils.face(this.lie.entity(), this.player.getEyePosition());
+
+        boolean changed = thisTickOffset.subtract(this.lastTickOffset).length() > 0.001;
+
+        if (changed) EntityUtils.startInterpolationIn(this.lie.entity(), 0);
+        this.lastTickOffset = thisTickOffset;
     }
 
     public static void create(ServerPlayer player) {
