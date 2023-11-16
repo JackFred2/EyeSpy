@@ -85,7 +85,7 @@ public class LieManager {
     }
 
     private static void flashRed(ServerPlayer player, EntityLie<Display.BlockDisplay> lie) {
-        var colour = getCurrentColour(player.serverLevel());
+        var colour = getCurrentColour(player.getLevel());
 
         // TODO: make JackFredLib change display entity colour via override instead of teams, should prevent desync when
         //       flashing displays
@@ -93,7 +93,7 @@ public class LieManager {
     }
 
     private static void flashRed(ServerPlayer player, EntityGlowLie<? extends Entity> lie) {
-        lie.setGlowColour(getCurrentColour(player.serverLevel()));
+        lie.setGlowColour(getCurrentColour(player.getLevel()));
     }
 
     private static void onBlockFade(ServerPlayer ignored, EntityLie<Display.BlockDisplay> lie) {

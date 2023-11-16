@@ -7,7 +7,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.Saddleable;
 import net.minecraft.world.entity.npc.Npc;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.MaterialColor;
 import red.jackf.jackfredlib.api.colour.Colour;
 import red.jackf.jackfredlib.api.colour.Colours;
 
@@ -54,8 +54,8 @@ public class EyeSpyColours {
     }
 
     public static Colour getForBlock(BlockState state) {
-        MapColor mapColor = state.getBlock().defaultMapColor();
-        Colour colour = mapColor == MapColor.NONE ? Colours.WHITE : Colour.fromInt(mapColor.col);
+        MaterialColor materialColour = state.getBlock().defaultMaterialColor();
+        Colour colour = materialColour == MaterialColor.NONE ? Colours.WHITE : Colour.fromInt(materialColour.col);
         return colour.lerp(Colours.WHITE, .25f);
     }
 }

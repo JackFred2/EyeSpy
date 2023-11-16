@@ -35,13 +35,13 @@ public class Ping {
     private static void onBlock(ServerPlayer player, BlockHitResult blockHit) {
         EyeSpy.LOGGER.debug("Result: BLOCK {}", blockHit.getBlockPos().toShortString());
 
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.getLevel();
         Collection<ServerPlayer> players = PlayerLookup.around(level, player.getEyePosition(), EyeSpy.CONFIG.instance().ping.notifyRangeBlocks);
 
         var existing = LieManager.getBlockHighlight(blockHit.getBlockPos());
 
         if (existing.isPresent()) {
-            if (player.level().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
+            if (player.getLevel().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
                 existing.get().lie().fade();
                 Sounds.playWarn(players, blockHit.getBlockPos().getCenter());
                 LieManager.createBlock(level, players, blockHit.getBlockPos(), true);
@@ -60,13 +60,13 @@ public class Ping {
     private static void onEntity(ServerPlayer player, EntityHitResult entityHit) {
         EyeSpy.LOGGER.debug("Result: ENTITY {}", entityHit.getEntity().getClass().getSimpleName());
 
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.getLevel();
         Collection<ServerPlayer> players = PlayerLookup.tracking(entityHit.getEntity());
 
         var existing = LieManager.getEntityHighlight(entityHit.getEntity());
 
         if (existing.isPresent()) {
-            if (player.level().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
+            if (player.getLevel().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
                 existing.get().lie().fade();
                 Sounds.playWarn(players, entityHit.getEntity().getEyePosition());
                 LieManager.createEntity(level, players, entityHit.getEntity(), true);

@@ -39,7 +39,7 @@ public class RangefindLie {
 
     private RangefindLie(ServerPlayer player) {
         this.player = player;
-        this.lie = EntityLie.builder(EntityBuilders.textDisplay(player.serverLevel())
+        this.lie = EntityLie.builder(EntityBuilders.textDisplay(player.getLevel())
                                                    .billboard(Display.BillboardConstraints.FIXED)
                                                    .backgroundColour(0x80, 0x00, 0x00, 0x00)
                                                    .seeThrough(false)
@@ -60,7 +60,7 @@ public class RangefindLie {
         } else {
             this.refreshPosAngleAndScale();
 
-            ServerLevel level = this.player.serverLevel();
+            ServerLevel level = this.player.getLevel();
 
             if ((level.getGameTime() & REFRESH_INTERVAL_TICKS) == 0) {
                 HitResult hit = Raycasting.cast(player);
@@ -82,7 +82,7 @@ public class RangefindLie {
     private Component makeBlockText(BlockHitResult hit) {
         if (!EyeSpy.CONFIG.instance().rangefinder.showBlockName) return makeDistanceText(hit);
 
-        BlockState state = this.player.serverLevel().getBlockState(hit.getBlockPos());
+        BlockState state = this.player.getLevel().getBlockState(hit.getBlockPos());
         Style style = EyeSpy.CONFIG.instance().rangefinder.useColours ?
                 Style.EMPTY.withColor(EyeSpyColours.getForBlock(state).toARGB()) : Style.EMPTY;
 

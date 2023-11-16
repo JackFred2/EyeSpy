@@ -65,7 +65,7 @@ public class CommandConfig {
                                                                           BiConsumer<EyeSpyConfig, Boolean> set) {
         return Commands.literal(name)
                        .executes(ctx -> {
-                           ctx.getSource().sendSuccess(() -> Formatting.infoLine(
+                           ctx.getSource().sendSuccess(Formatting.infoLine(
                                    translatable("eyespy.command.config.check",
                                                 makeHover(name, fullName, baseWikiPage),
                                                 Formatting.bool(get.apply(getConfig())))
@@ -85,7 +85,7 @@ public class CommandConfig {
                                                      } else {
                                                          set.accept(getConfig(), true);
                                                          verifySafeAndLoad();
-                                                         ctx.getSource().sendSuccess(() -> Formatting.infoLine(
+                                                         ctx.getSource().sendSuccess(Formatting.infoLine(
                                                                  translatable("eyespy.command.config.change",
                                                                               makeHover(name, fullName, baseWikiPage),
                                                                               Formatting.bool(false),
@@ -108,7 +108,7 @@ public class CommandConfig {
                                                                      } else {
                                                                          set.accept(getConfig(), false);
                                                                          verifySafeAndLoad();
-                                                                         ctx.getSource().sendSuccess(() -> Formatting.infoLine(
+                                                                         ctx.getSource().sendSuccess(Formatting.infoLine(
                                                                                  translatable("eyespy.command.config.change",
                                                                                               makeHover(name, fullName, baseWikiPage),
                                                                                               Formatting.bool(true),
@@ -178,7 +178,7 @@ public class CommandConfig {
                                                                            BiConsumer<EyeSpyConfig, Integer> set) {
         return Commands.literal(name)
                        .executes(ctx -> {
-                           ctx.getSource().sendSuccess(() -> Formatting.infoLine(
+                           ctx.getSource().sendSuccess(Formatting.infoLine(
                                    translatable("eyespy.command.config.check",
                                                 makeHover(name, fullName, baseWikiPage),
                                                 Formatting.integer(get.apply(getConfig())))
@@ -200,7 +200,7 @@ public class CommandConfig {
                                            } else {
                                                set.accept(getConfig(), newValue);
                                                verifySafeAndLoad();
-                                               ctx.getSource().sendSuccess(() -> Formatting.infoLine(
+                                               ctx.getSource().sendSuccess(Formatting.infoLine(
                                                        translatable("eyespy.command.config.change",
                                                                     makeHover(name, fullName, baseWikiPage),
                                                                     Formatting.integer(old),

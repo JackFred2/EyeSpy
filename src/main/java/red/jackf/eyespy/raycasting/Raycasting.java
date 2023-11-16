@@ -53,6 +53,6 @@ public class Raycasting {
         Vec3 direction = player.getViewVector(1);
         Vec3 to = from.add(direction.x * maxDistance, direction.y * maxDistance, direction.z * maxDistance);
 
-        return player.level().clip(new CustomClipContext(from, to, player, hitFluids));
+        return player.getLevel().clip(new CustomClipContext(from, to, player, hitFluids));
     }
 }

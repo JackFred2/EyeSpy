@@ -18,7 +18,7 @@ public class BlockHighlight {
     }
 
     public void refreshLifetime() {
-        this.lastRefreshed = lie.entity().level().getGameTime();
+        this.lastRefreshed = lie.entity().getLevel().getGameTime();
         Debris.INSTANCE.schedule(lie, EyeSpy.CONFIG.instance().ping.lifetimeTicks);
     }
 
