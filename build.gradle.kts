@@ -24,6 +24,8 @@ base {
 }
 
 repositories {
+	mavenLocal()
+
 	// Parchment Mappings
 	maven {
 		name = "ParchmentMC"
