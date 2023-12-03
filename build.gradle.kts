@@ -10,14 +10,19 @@ plugins {
 	id("maven-publish")
 	id("fabric-loom") version "1.4-SNAPSHOT"
 	id("com.github.breadmoirai.github-release") version "2.4.1"
-	id("org.ajoberstar.grgit") version "5.0.+"
+	id("org.ajoberstar.grgit") version "5.2.1"
 	id("me.modmuss50.mod-publish-plugin") version "0.3.3"
 }
 
-group = properties["maven_group"]!!
-version = "${properties["mod_version"]}+${properties["minecraft_version"]}"
+// it CAN be null if not in a git repo
+val grgit = runCatching { project.grgitService.service.get().grgit }.getOrNull()
 
-val modReleaseType = properties["type"]?.toString() ?: "release"
+fun getVersionSuffix(): String {
+	return grgit?.branch?.current()?.name ?: "nogit+${properties["minecraft_version"]}"
+}
+
+group = properties["maven_group"]!!
+version = "${properties["mod_version"]}+${getVersionSuffix()}"
 
 base {
 	archivesName.set("${properties["archives_base_name"]}")
@@ -98,7 +103,6 @@ loom {
 			runDir = "run"
 			source(sourceSets["client"])
 			ideConfigGenerated(true)
-			this.vmArgs.add("-Dlog4j.configurationFile=../log4j2.xml")
 			client()
 		}
 
@@ -108,16 +112,12 @@ loom {
 			runDir = "runServer"
 			source(sourceSets["main"])
 			ideConfigGenerated(true)
-			this.vmArgs.add("-Dlog4j.configurationFile=../log4j2.xml")
 			server()
 		}
 	}
-
-	//accessWidenerPath.set(file("src/main/resources/lenientdeath.accesswidener"))
 }
 
-// require for local compile + running, but not for dependencies of this project
-fun DependencyHandlerScope.modCompileRuntime(any: String, configure: ExternalModuleDependency.() -> Unit = {}) {
+fun DependencyHandlerScope.modLocalImplementation(any: String, configure: ExternalModuleDependency.() -> Unit = {}) {
 	modCompileOnly(any, configure)
 	modLocalRuntime(any, configure)
 }
@@ -142,7 +142,7 @@ dependencies {
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
 
 	// COMPATIBILITY
-	modCompileRuntime("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
+	modLocalImplementation("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
 
 	modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
 }
@@ -174,7 +174,6 @@ tasks.jar {
 fun makeChangelogPrologue(): String {
 	return """
 		|Bundled:
-		|  - Mixin Extras: ${properties["mixin_extras_version"]}
 		|  - Server Translations API: ${properties["server_translations_api_version"]}
 		|  - JackFredLib: Base: ${properties["jflib_base_version"]}
 		|  - JackFredLib: Config: ${properties["jflib_config_version"]}
@@ -187,84 +186,93 @@ println(makeChangelogPrologue())
 
 val lastTagVal = properties["lastTag"]?.toString()
 val newTagVal = properties["newTag"]?.toString()
-if (lastTagVal != null && newTagVal != null) {
-	val generateChangelogTask = tasks.register<GenerateChangelogTask>("generateChangelog") {
+
+var changelogText: Provider<String>
+var changelogTask: TaskProvider<GenerateChangelogTask>? = null
+
+changelogText = if (lastTagVal != null && newTagVal != null) {
+	changelogTask = tasks.register<GenerateChangelogTask>("generateChangelog") {
 		lastTag.set(lastTagVal)
 		newTag.set(newTagVal)
-		prologue.set(makeChangelogPrologue())
 		githubUrl.set(properties["github_url"]!!.toString())
 		prefixFilters.set(properties["changelog_filter"]!!.toString().split(","))
 	}
 
-	if (System.getenv().containsKey("GITHUB_TOKEN")) {
-		tasks.named<GithubReleaseTask>("githubRelease") {
-			dependsOn(generateChangelogTask)
+	project.provider {
+		return@provider changelogTask!!.get().changelogFile.get().asFile.readText()
+	}
+} else {
+	project.provider { "Could not generate changelog." }
+}
 
-			authorization.set(System.getenv("GITHUB_TOKEN")?.let { "Bearer $it" })
-			owner.set(properties["github_owner"]!!.toString())
-			repo.set(properties["github_repo"]!!.toString())
-			tagName.set(newTagVal)
-			releaseName.set("${properties["mod_name"]} $newTagVal")
-			targetCommitish.set(grgit.branch.current().name)
-			releaseAssets.from(
-				tasks["remapJar"].outputs.files,
-				tasks["remapSourcesJar"].outputs.files,
-			)
+if (System.getenv().containsKey("GITHUB_TOKEN") && grgit != null) {
+	tasks.named<GithubReleaseTask>("githubRelease") {
+		authorization.set(System.getenv("GITHUB_TOKEN")?.let { "Bearer $it" })
+		body.set(changelogText)
+		owner.set(properties["github_owner"]!!.toString())
+		repo.set(properties["github_repo"]!!.toString())
+		tagName.set(newTagVal)
+		releaseName.set("${properties["mod_name"]} $newTagVal")
+		targetCommitish.set(grgit.branch.current().name)
+		releaseAssets.from(
+			tasks["remapJar"].outputs.files,
+			tasks["remapSourcesJar"].outputs.files,
+		)
 
-			body.set(provider {
-				return@provider generateChangelogTask.get().changelogFile.get().asFile.readText()
-			})
+		changelogTask?.let {
+			this@named.dependsOn(it)
 		}
 	}
+}
 
-	tasks.named<DefaultTask>("publishMods") {
-		dependsOn(generateChangelogTask)
-	}
+tasks.named<DefaultTask>("publishMods") {
+	changelogTask?.let { this.dependsOn(changelogTask) }
+}
 
-	if (listOf("CURSEFORGE_TOKEN", "MODRINTH_TOKEN").any { System.getenv().containsKey(it) }) {
-		publishMods {
-			changelog.set(provider {
-				return@provider generateChangelogTask.get().changelogFile.get().asFile.readText()
-			})
-			type.set(ReleaseType.BETA)
-			modLoaders.add("fabric")
-			modLoaders.add("quilt")
-			file.set(tasks.named<RemapJarTask>("remapJar").get().archiveFile)
-			// additionalFiles.from(tasks.named<RemapSourcesJarTask>("remapSourcesJar").get().archiveFile)
+if (listOf("CURSEFORGE_TOKEN", "MODRINTH_TOKEN").any { System.getenv().containsKey(it) }) {
+	publishMods {
+		changelog.set(changelogText)
+		type.set(when(properties["release_type"]) {
+			"release" -> ReleaseType.STABLE
+			"beta" -> ReleaseType.BETA
+			else -> ReleaseType.ALPHA
+		})
+		modLoaders.add("fabric")
+		modLoaders.add("quilt")
+		file.set(tasks.named<RemapJarTask>("remapJar").get().archiveFile)
 
-			if (System.getenv().containsKey("CURSEFORGE_TOKEN") || dryRun.get()) {
-				curseforge {
-					projectId.set("935678")
-					accessToken.set(System.getenv("CURSEFORGE_TOKEN"))
-					properties["game_versions"]!!.toString().split(",").forEach {
-						minecraftVersions.add(it)
+		if (System.getenv().containsKey("CURSEFORGE_TOKEN") || dryRun.get()) {
+			curseforge {
+				projectId.set("935678")
+				accessToken.set(System.getenv("CURSEFORGE_TOKEN"))
+				properties["game_versions_curse"]!!.toString().split(",").forEach {
+					minecraftVersions.add(it)
+				}
+				displayName.set("${properties["prefix"]!!} ${properties["mod_name"]!!} ${version.get()}")
+				listOf("fabric-api").forEach {
+					requires {
+						slug.set(it)
 					}
-					displayName.set("${properties["prefix"]!!} ${properties["mod_name"]!!} ${version.get()}")
-					listOf("fabric-api").forEach {
-						requires {
-							slug.set(it)
-						}
-					}
-					listOf("server-translation-api", "jankson").forEach {
-						embeds {
-							slug.set(it)
-						}
+				}
+				listOf("server-translation-api").forEach {
+					embeds {
+						slug.set(it)
 					}
 				}
 			}
+		}
 
-			if (System.getenv().containsKey("MODRINTH_TOKEN") || dryRun.get()) {
-				modrinth {
-					accessToken.set(System.getenv("MODRINTH_TOKEN"))
-					projectId.set("fZqxffZK")
-					properties["game_versions"]!!.toString().split(",").forEach {
-						minecraftVersions.add(it)
-					}
-					displayName.set("${properties["mod_name"]!!} ${version.get()}")
-					listOf("fabric-api").forEach {
-						requires {
-							slug.set(it)
-						}
+		if (System.getenv().containsKey("MODRINTH_TOKEN") || dryRun.get()) {
+			modrinth {
+				accessToken.set(System.getenv("MODRINTH_TOKEN"))
+				projectId.set("fZqxffZK")
+				properties["game_versions_mr"]!!.toString().split(",").forEach {
+					minecraftVersions.add(it)
+				}
+				displayName.set("${properties["mod_name"]!!} ${version.get()}")
+				listOf("fabric-api").forEach {
+					requires {
+						slug.set(it)
 					}
 				}
 			}
