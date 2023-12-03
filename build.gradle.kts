@@ -143,7 +143,7 @@ dependencies {
 	// COMPATIBILITY
 	modLocalImplementation("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
 
-	modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
+	//modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
 }
 
 tasks.withType<ProcessResources>().configureEach {
