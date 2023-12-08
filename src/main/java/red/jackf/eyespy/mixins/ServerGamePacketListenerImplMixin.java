@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import red.jackf.eyespy.EyeSpy;
 import red.jackf.eyespy.networking.EyeSpyNetworking;
 import red.jackf.eyespy.ping.Ping;
 
@@ -24,7 +23,6 @@ public abstract class ServerGamePacketListenerImplMixin {
                     ordinal = 0),
             cancellable = true)
     private void eyespy$handlePlayerSwap(ServerboundPlayerActionPacket packet, CallbackInfo ci) {
-        if (!EyeSpy.CONFIG.instance().ping.enabled) return;
         if (EyeSpyNetworking.hasClientInstalled(player.getGameProfile())) return; // don't if they have dedicated keybind
 
         if (Ping.canActivate(player)) {

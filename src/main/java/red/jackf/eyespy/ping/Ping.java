@@ -21,6 +21,7 @@ public class Ping {
      * @return Whether the player can ping at this time.
      */
     public static boolean canActivate(ServerPlayer player) {
+        if (!EyeSpy.CONFIG.instance().ping.enabled) return false;
         if (EyeSpy.CONFIG.instance().ping.requiresZoomIn) {
             return player.getUseItem().is(Items.SPYGLASS);
         } else {
