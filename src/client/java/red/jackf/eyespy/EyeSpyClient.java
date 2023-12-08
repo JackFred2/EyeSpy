@@ -9,7 +9,7 @@ import org.lwjgl.glfw.GLFW;
 import red.jackf.eyespy.networking.packets.C2SPing;
 
 public class EyeSpyClient implements ClientModInitializer {
-    private static final KeyMapping PING = new KeyMapping("key.eyespy.ping", GLFW.GLFW_KEY_F, "key.categories.multiplayer");
+    private static final KeyMapping PING = new KeyMapping("key.eyespy.ping", GLFW.GLFW_KEY_Z, "key.categories.multiplayer");
 
     @Override
     public void onInitializeClient() {
