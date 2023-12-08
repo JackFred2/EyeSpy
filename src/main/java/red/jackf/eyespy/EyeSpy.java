@@ -2,7 +2,10 @@ package red.jackf.eyespy;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import red.jackf.eyespy.command.EyeSpyCommand;
@@ -30,6 +33,8 @@ public class EyeSpy implements ModInitializer {
 		return new ResourceLocation(MODID, path);
 	}
 
+	private static @Nullable MinecraftServer server = null;
+
 	@Override
 	public void onInitialize() {
 		CONFIG.load();
@@ -37,5 +42,13 @@ public class EyeSpy implements ModInitializer {
 		EyeSpyNetworking.setup();
 
 		CommandRegistrationCallback.EVENT.register(EyeSpyCommand::new);
+
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> EyeSpy.server = server);
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> EyeSpy.server = null);
+	}
+
+	@Nullable
+	public static MinecraftServer getServer() {
+		return server;
 	}
 }
