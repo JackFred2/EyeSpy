@@ -27,6 +27,9 @@
 	"mixins": [
 		"eyespy.mixins.json"
 	],
+	"suggests": {
+		"amecs": "*"
+	},
 	"depends": {
 		"fabricloader": ">=0.15.0",
 		"minecraft": ">=1.20.3",
