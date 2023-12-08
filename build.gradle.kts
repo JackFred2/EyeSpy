@@ -149,6 +149,10 @@ dependencies {
 tasks.withType<ProcessResources>().configureEach {
 	inputs.property("version", version)
 
+	from("src/main/resources/assets/eyespy/lang") {
+		into("data/eyespy/lang")
+	}
+
 	filesMatching("fabric.mod.json") {
 		expand(inputs.properties)
 	}
