@@ -17,6 +17,9 @@
 	"icon": "assets/eyespy/icon.png",
 	"environment": "*",
 	"entrypoints": {
+		"client": [
+			"red.jackf.eyespy.EyeSpyClient"
+		],
 		"main": [
           "red.jackf.eyespy.EyeSpy"
 		]

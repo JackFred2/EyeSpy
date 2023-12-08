@@ -3,6 +3,7 @@ package red.jackf.eyespy.ping;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -14,6 +15,19 @@ import red.jackf.eyespy.raycasting.Raycasting;
 import java.util.Collection;
 
 public class Ping {
+    /**
+     * Check if a player can ping given their current state and mod settings.
+     * @param player Player trying to ping
+     * @return Whether the player can ping at this time.
+     */
+    public static boolean canActivate(ServerPlayer player) {
+        if (EyeSpy.CONFIG.instance().ping.requiresZoomIn) {
+            return player.getUseItem().is(Items.SPYGLASS);
+        } else {
+            return player.getMainHandItem().is(Items.SPYGLASS) || player.getOffhandItem().is(Items.SPYGLASS);
+        }
+    }
+
     public static void activate(ServerPlayer player) {
         EyeSpy.LOGGER.debug("Ping from {}", player.getName().getString());
 
