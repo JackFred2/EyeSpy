@@ -1,7 +1,11 @@
 package red.jackf.eyespy.config;
 
 import blue.endless.jankson.Comment;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.Nullable;
+import red.jackf.eyespy.EyeSpy;
+import red.jackf.eyespy.networking.packets.S2CSettings;
 import red.jackf.jackfredlib.api.config.Config;
 
 public class EyeSpyConfig implements Config<EyeSpyConfig> {
@@ -80,5 +84,17 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         this.maxRangeBlocks = Mth.clamp(this.maxRangeBlocks, 16, 384);
         this.ping.notifyRangeBlocks = Mth.clamp(this.ping.notifyRangeBlocks, 8, 256);
         this.ping.lifetimeTicks = Mth.clamp(this.ping.lifetimeTicks, 60, 400);
+    }
+
+    @Override
+    public void onLoad(@Nullable EyeSpyConfig old) {
+        var server = EyeSpy.getServer();
+        if (server != null) {
+            server.getPlayerList().getPlayers().forEach(player -> {
+                if (ServerPlayNetworking.canSend(player, S2CSettings.TYPE)) {
+                    ServerPlayNetworking.send(player, S2CSettings.create());
+                }
+            });
+        }
     }
 }
