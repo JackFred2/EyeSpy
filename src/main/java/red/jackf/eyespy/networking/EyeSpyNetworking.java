@@ -37,7 +37,7 @@ public class EyeSpyNetworking {
         }));
 
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-            HAS_CLIENT_MOD_INSTALLED.remove(handler.getOwner());
+            HAS_CLIENT_MOD_INSTALLED.remove(handler.getPlayer().getGameProfile());
             LieManager.fadeEverything(handler.player);
         });
     }
