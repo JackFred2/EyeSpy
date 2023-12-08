@@ -1,5 +1,6 @@
 package red.jackf.eyespy.command;
 
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -211,7 +212,7 @@ public class CommandConfig {
                                            }
                                        })
                 );
-    }/*
+    }
 
     private static LiteralArgumentBuilder<CommandSourceStack> makeFloatRange(String name,
                                                                              String fullName,
@@ -257,7 +258,7 @@ public class CommandConfig {
                 );
     }
 
-
+/*
     private static LiteralArgumentBuilder<CommandSourceStack> makeWord(String name,
                                                                        String fullName,
                                                                        String baseWikiPage,
@@ -383,6 +384,13 @@ public class CommandConfig {
                               WikiPage.RANGEFINDER,
                               config -> config.rangefinder.showEntityName,
                               (config, newVal) -> config.rangefinder.showEntityName = newVal));
+
+        root.then(makeFloatRange("textScale",
+                                 "rangefinder.textScale",
+                                 WikiPage.RANGEFINDER,
+                                 0.25f, 2f,
+                                 config -> config.rangefinder.textScale,
+                                 (config, newVal) -> config.rangefinder.textScale = newVal));
 
         return root;
     }

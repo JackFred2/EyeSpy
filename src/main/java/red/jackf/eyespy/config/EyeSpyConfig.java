@@ -77,6 +77,12 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
                 Options: true, false
                 Default: true""")
         public boolean showEntityName = true;
+
+        @Comment("""
+                Modifier for the size of the rangefinder text.
+                Options: [0.25, 2]
+                Default: 1""")
+        public float textScale = 1;
     }
 
     @Override
@@ -84,6 +90,7 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         this.maxRangeBlocks = Mth.clamp(this.maxRangeBlocks, 16, 384);
         this.ping.notifyRangeBlocks = Mth.clamp(this.ping.notifyRangeBlocks, 8, 256);
         this.ping.lifetimeTicks = Mth.clamp(this.ping.lifetimeTicks, 60, 400);
+        this.rangefinder.textScale = Mth.clamp(this.rangefinder.textScale, 0.25f, 2f);
     }
 
     @Override
