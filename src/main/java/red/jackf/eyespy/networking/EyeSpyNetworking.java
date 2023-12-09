@@ -9,7 +9,6 @@ import red.jackf.eyespy.networking.packets.C2SHasClientModInstalled;
 import red.jackf.eyespy.networking.packets.C2SPing;
 import red.jackf.eyespy.networking.packets.S2CSettings;
 import red.jackf.eyespy.ping.Ping;
-import red.jackf.eyespy.ping.lies.LieManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,9 +35,6 @@ public class EyeSpyNetworking {
             if (Ping.canActivate(player)) Ping.activate(player);
         }));
 
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-            HAS_CLIENT_MOD_INSTALLED.remove(handler.getOwner());
-            LieManager.fadeEverything(handler.player);
-        });
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> HAS_CLIENT_MOD_INSTALLED.remove(handler.getOwner()));
     }
 }

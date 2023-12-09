@@ -57,9 +57,9 @@ public class Ping {
 
         if (existing.isPresent()) {
             if (pinger.level().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
-                existing.get().lie().fade();
+                existing.get().fade();
                 Sounds.playWarn(viewing, blockHit.getBlockPos().getCenter());
-                LieManager.createBlock(level, pinger, viewing, blockHit.getBlockPos(), true);
+                LieManager.createBlock(level, blockHit.getBlockPos(), pinger, viewing, true);
             } else {
                 Sounds.playBlock(viewing, blockHit, level.getBlockState(blockHit.getBlockPos()));
                 LieManager.bump(pinger, existing.get());
@@ -69,22 +69,21 @@ public class Ping {
         }
 
         Sounds.playBlock(viewing, blockHit, level.getBlockState(blockHit.getBlockPos()));
-        LieManager.createBlock(level, pinger, viewing, blockHit.getBlockPos(), false);
+        LieManager.createBlock(level, blockHit.getBlockPos(), pinger, viewing, false);
     }
 
     private static void onEntity(ServerPlayer pinger, EntityHitResult entityHit) {
         EyeSpy.LOGGER.debug("Result: ENTITY {}", entityHit.getEntity().getClass().getSimpleName());
 
-        ServerLevel level = pinger.serverLevel();
         Collection<ServerPlayer> viewing = PlayerLookup.tracking(entityHit.getEntity());
 
         var existing = LieManager.getEntityHighlight(pinger, entityHit.getEntity());
 
         if (existing.isPresent()) {
             if (pinger.level().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
-                existing.get().lie().fade();
+                existing.get().fade();
                 Sounds.playWarn(viewing, entityHit.getEntity().getEyePosition());
-                LieManager.createEntity(level, pinger, viewing, entityHit.getEntity(), true);
+                LieManager.createEntity(pinger, viewing, entityHit.getEntity(), true);
             } else {
                 Sounds.playEntity(viewing, entityHit);
                 LieManager.bump(pinger, existing.get());
@@ -93,6 +92,6 @@ public class Ping {
         }
 
         Sounds.playEntity(viewing, entityHit);
-        LieManager.createEntity(level, pinger, viewing, entityHit.getEntity(), false);
+        LieManager.createEntity(pinger, viewing, entityHit.getEntity(), false);
     }
 }
