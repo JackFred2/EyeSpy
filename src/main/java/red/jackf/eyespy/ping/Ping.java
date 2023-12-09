@@ -16,9 +16,9 @@ import java.util.Collection;
 
 public class Ping {
     /**
-     * Check if a player can ping given their current state and mod settings.
+     * Check if a pinger can ping given their current state and mod settings.
      * @param player Player trying to ping
-     * @return Whether the player can ping at this time.
+     * @return Whether the pinger can ping at this time.
      */
     public static boolean canActivate(ServerPlayer player) {
         if (!EyeSpy.CONFIG.instance().ping.enabled) return false;
@@ -47,52 +47,52 @@ public class Ping {
         Sounds.playMiss(player);
     }
 
-    private static void onBlock(ServerPlayer player, BlockHitResult blockHit) {
+    private static void onBlock(ServerPlayer pinger, BlockHitResult blockHit) {
         EyeSpy.LOGGER.debug("Result: BLOCK {}", blockHit.getBlockPos().toShortString());
 
-        ServerLevel level = player.serverLevel();
-        Collection<ServerPlayer> players = PlayerLookup.around(level, player.getEyePosition(), EyeSpy.CONFIG.instance().ping.notifyRangeBlocks);
+        ServerLevel level = pinger.serverLevel();
+        Collection<ServerPlayer> viewing = PlayerLookup.around(level, pinger.getEyePosition(), EyeSpy.CONFIG.instance().ping.notifyRangeBlocks);
 
-        var existing = LieManager.getBlockHighlight(blockHit.getBlockPos());
+        var existing = LieManager.getBlockHighlight(pinger, blockHit.getBlockPos());
 
         if (existing.isPresent()) {
-            if (player.level().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
+            if (pinger.level().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
                 existing.get().lie().fade();
-                Sounds.playWarn(players, blockHit.getBlockPos().getCenter());
-                LieManager.createBlock(level, players, blockHit.getBlockPos(), true);
+                Sounds.playWarn(viewing, blockHit.getBlockPos().getCenter());
+                LieManager.createBlock(level, pinger, viewing, blockHit.getBlockPos(), true);
             } else {
-                Sounds.playBlock(players, blockHit, level.getBlockState(blockHit.getBlockPos()));
-                existing.get().refreshLifetime();
+                Sounds.playBlock(viewing, blockHit, level.getBlockState(blockHit.getBlockPos()));
+                LieManager.bump(pinger, existing.get());
             }
 
             return;
         }
 
-        Sounds.playBlock(players, blockHit, level.getBlockState(blockHit.getBlockPos()));
-        LieManager.createBlock(level, players, blockHit.getBlockPos(), false);
+        Sounds.playBlock(viewing, blockHit, level.getBlockState(blockHit.getBlockPos()));
+        LieManager.createBlock(level, pinger, viewing, blockHit.getBlockPos(), false);
     }
 
-    private static void onEntity(ServerPlayer player, EntityHitResult entityHit) {
+    private static void onEntity(ServerPlayer pinger, EntityHitResult entityHit) {
         EyeSpy.LOGGER.debug("Result: ENTITY {}", entityHit.getEntity().getClass().getSimpleName());
 
-        ServerLevel level = player.serverLevel();
-        Collection<ServerPlayer> players = PlayerLookup.tracking(entityHit.getEntity());
+        ServerLevel level = pinger.serverLevel();
+        Collection<ServerPlayer> viewing = PlayerLookup.tracking(entityHit.getEntity());
 
-        var existing = LieManager.getEntityHighlight(entityHit.getEntity());
+        var existing = LieManager.getEntityHighlight(pinger, entityHit.getEntity());
 
         if (existing.isPresent()) {
-            if (player.level().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
+            if (pinger.level().getGameTime() - existing.get().getLastRefreshed() <= Constants.DOUBLE_TAP_INTERVAL) {
                 existing.get().lie().fade();
-                Sounds.playWarn(players, entityHit.getEntity().getEyePosition());
-                LieManager.createEntity(level, players, entityHit.getEntity(), true);
+                Sounds.playWarn(viewing, entityHit.getEntity().getEyePosition());
+                LieManager.createEntity(level, pinger, viewing, entityHit.getEntity(), true);
             } else {
-                Sounds.playEntity(players, entityHit);
-                existing.get().refreshLifetime();
+                Sounds.playEntity(viewing, entityHit);
+                LieManager.bump(pinger, existing.get());
             }
             return;
         }
 
-        Sounds.playEntity(players, entityHit);
-        LieManager.createEntity(level, players, entityHit.getEntity(), false);
+        Sounds.playEntity(viewing, entityHit);
+        LieManager.createEntity(level, pinger, viewing, entityHit.getEntity(), false);
     }
 }
