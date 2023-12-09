@@ -1,5 +1,6 @@
 package red.jackf.eyespy.ping;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,14 +30,27 @@ public class Sounds {
     }
 
     public static void playEntity(Collection<ServerPlayer> players, EntityHitResult entityHit) {
+        var sound = getEntitySound(entityHit.getEntity());
         for (ServerPlayer player : players) {
-            send(player, SoundEvents.NOTE_BLOCK_BELL, towards(player.getEyePosition(), entityHit.getEntity().position()), getEntityPitch(entityHit.getEntity()));
+            send(player, sound.getFirst(), towards(player.getEyePosition(), entityHit.getEntity().position()), sound.getSecond());
         }
+    }
+
+    private static Pair<Holder<SoundEvent>, Float> getEntitySound(Entity entity) {
+        if (!(entity instanceof LivingEntity living)) return Pair.of(SoundEvents.NOTE_BLOCK_BELL, 1f);
+
+        float pitch = (float) Mth.clamp(Math.exp(-living.getHealth() / 18) * 1.5 + 0.5, 0.5, 2);
+
+        return switch (entity.getType().getCategory()) {
+            case MONSTER -> Pair.of(SoundEvents.NOTE_BLOCK_PLING, pitch / 2 + 0.25f);
+            case WATER_CREATURE, WATER_AMBIENT, AXOLOTLS -> Pair.of(Holder.direct(SoundEvents.PLAYER_SPLASH), pitch);
+            default -> Pair.of(SoundEvents.NOTE_BLOCK_BELL, pitch);
+        };
     }
 
     public static void playWarn(Collection<ServerPlayer> players, Vec3 pos) {
         for (ServerPlayer player : players) {
-            send(player, SoundEvents.NOTE_BLOCK_PLING, towards(player.getEyePosition(), pos), 0.5f);
+            send(player, SoundEvents.NOTE_BLOCK_PLING, towards(player.getEyePosition(), pos), 0.4f);
         }
     }
 
@@ -44,11 +58,6 @@ public class Sounds {
 
     private static float getBlockPitch(BlockState state) {
         return 2f - Mth.clamp(state.getBlock().defaultDestroyTime() / 5f, 0, 1.25f);
-    }
-
-    private static float getEntityPitch(Entity entity) {
-        if (!(entity instanceof LivingEntity living)) return 1f;
-        return 2f - Mth.clamp(living.getHealth() / 60f, 0, 1f);
     }
 
     private static float jitterPitch(ServerPlayer player) {
