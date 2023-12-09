@@ -96,6 +96,7 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         this.maxRangeBlocks = Mth.clamp(this.maxRangeBlocks, 16, 384);
         this.ping.notifyRangeBlocks = Mth.clamp(this.ping.notifyRangeBlocks, 8, 256);
         this.ping.lifetimeTicks = Mth.clamp(this.ping.lifetimeTicks, 60, 400);
+        this.ping.maxPings = Mth.clamp(this.ping.maxPings, 1, 32);
         this.rangefinder.textScale = Mth.clamp(this.rangefinder.textScale, 0.25f, 2f);
     }
 
