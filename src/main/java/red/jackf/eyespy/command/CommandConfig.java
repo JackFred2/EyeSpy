@@ -223,7 +223,7 @@ public class CommandConfig {
                                                                              BiConsumer<EyeSpyConfig, Float> set) {
         return Commands.literal(name)
                        .executes(ctx -> {
-                           ctx.getSource().sendSuccess(() -> Formatting.infoLine(
+                           ctx.getSource().sendSuccess(Formatting.infoLine(
                                    translatable("eyespy.command.config.check",
                                                 makeHover(name, fullName, baseWikiPage),
                                                 Formatting.floating(get.apply(getConfig())))
@@ -245,7 +245,7 @@ public class CommandConfig {
                                            } else {
                                                set.accept(getConfig(), newValue);
                                                verifySafeAndLoad();
-                                               ctx.getSource().sendSuccess(() -> Formatting.infoLine(
+                                               ctx.getSource().sendSuccess(Formatting.infoLine(
                                                        translatable("eyespy.command.config.change",
                                                                     makeHover(name, fullName, baseWikiPage),
                                                                     Formatting.floating(old),
