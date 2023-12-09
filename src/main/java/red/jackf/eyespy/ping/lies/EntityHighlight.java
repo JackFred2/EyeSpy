@@ -5,11 +5,13 @@ import red.jackf.eyespy.EyeSpy;
 import red.jackf.jackfredlib.api.lying.Debris;
 import red.jackf.jackfredlib.api.lying.glowing.EntityGlowLie;
 
-public class EntityHighlight {
+public final class EntityHighlight implements Highlight {
+    private final Entity entity;
     private final EntityGlowLie<? extends Entity> lie;
     private long lastRefreshed = -1;
 
-    public EntityHighlight(EntityGlowLie<? extends Entity> lie) {
+    public EntityHighlight(Entity entity, EntityGlowLie<? extends Entity> lie) {
+        this.entity = entity;
         this.lie = lie;
     }
 
@@ -24,5 +26,9 @@ public class EntityHighlight {
 
     public long getLastRefreshed() {
         return lastRefreshed;
+    }
+
+    public Entity entity() {
+        return entity;
     }
 }
