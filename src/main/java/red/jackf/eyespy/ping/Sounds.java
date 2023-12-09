@@ -43,7 +43,7 @@ public class Sounds {
 
         return switch (entity.getType().getCategory()) {
             case MONSTER -> Pair.of(SoundEvents.NOTE_BLOCK_PLING, pitch / 2 + 0.25f);
-            case WATER_CREATURE, WATER_AMBIENT, AXOLOTLS -> Pair.of(Holder.direct(SoundEvents.PLAYER_SPLASH), pitch);
+            case WATER_CREATURE, WATER_AMBIENT, AXOLOTLS, UNDERGROUND_WATER_CREATURE -> Pair.of(Holder.direct(SoundEvents.PLAYER_SPLASH), pitch);
             default -> Pair.of(SoundEvents.NOTE_BLOCK_BELL, pitch);
         };
     }
