@@ -65,7 +65,7 @@ public final class BlockHighlight implements Highlight {
     }
 
     private void flashWarning(ServerPlayer player, EntityLie<Display.BlockDisplay> lie) {
-        long timeSinceLast = player.level().getGameTime() - this.lastRefreshed;
+        long timeSinceLast = player.getLevel().getGameTime() - this.lastRefreshed;
         this.lie.entity().setGlowingTag((timeSinceLast / Constants.FLASH_INTERVAL) % 2 == 0);
     }
 

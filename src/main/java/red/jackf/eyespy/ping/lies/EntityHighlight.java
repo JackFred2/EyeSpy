@@ -31,7 +31,7 @@ public final class EntityHighlight implements Highlight {
     }
 
     private void flashWarning(ServerPlayer player, EntityGlowLie<Entity> entityEntityGlowLie) {
-        long timeSinceLast = player.level().getGameTime() - this.lastRefreshed;
+        long timeSinceLast = player.getLevel().getGameTime() - this.lastRefreshed;
         this.lie.setGlowColour((timeSinceLast / Constants.FLASH_INTERVAL) % 2 == 0 ? ChatFormatting.RED : null);
     }
 
