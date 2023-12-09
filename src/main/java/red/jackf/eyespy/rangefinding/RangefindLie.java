@@ -28,7 +28,6 @@ import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
 
 public class RangefindLie {
     private static final float MAX_DISTANCE = 3f;
-    private static final float SCALE = 0.020f * MAX_DISTANCE;
     private static final float OFFSET = 0.75f;
 
     private static final long REFRESH_INTERVAL_TICKS = 4L;
@@ -36,6 +35,10 @@ public class RangefindLie {
     private final ServerPlayer player;
     private final EntityLie<Display.TextDisplay> lie;
     private Vec3 lastTickOffset;
+
+    private static float getScale() {
+        return 0.020f * MAX_DISTANCE * EyeSpy.CONFIG.instance().rangefinder.textScale;
+    }
 
     private RangefindLie(ServerPlayer player) {
         this.player = player;
@@ -125,12 +128,12 @@ public class RangefindLie {
 
         Vec3 thisTickOffset = this.player.getEyePosition().add(this.player.getLookAngle().scale(distance)).subtract(this.lie.entity().position());
 
-        Vector3f translate = thisTickOffset.toVector3f().add(new Vector3f(0, scaleFactorRelativeToMax * -SCALE * OFFSET, 0));
+        Vector3f translate = thisTickOffset.toVector3f().add(new Vector3f(0, scaleFactorRelativeToMax * -getScale() * OFFSET, 0));
 
         EntityUtils.updateDisplayTransformation(this.lie.entity(),
                                                 translate,
                                                 null,
-                                                new Vector3f(scaleFactorRelativeToMax * SCALE),
+                                                new Vector3f(scaleFactorRelativeToMax * getScale()),
                                                 makeRotation()
         );
 
