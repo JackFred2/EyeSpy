@@ -1,5 +1,7 @@
 package red.jackf.eyespy.ping.lies;
 
+import com.mojang.authlib.GameProfile;
+import io.netty.util.internal.EmptyPriorityQueue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -8,38 +10,44 @@ import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import red.jackf.eyespy.EyeSpy;
 import red.jackf.eyespy.EyeSpyColours;
+import red.jackf.jackfredlib.api.lying.Lie;
 import red.jackf.jackfredlib.api.lying.entity.EntityLie;
 import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
 import red.jackf.jackfredlib.api.lying.glowing.EntityGlowLie;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class LieManager {
-    public static final Map<BlockPos, BlockHighlight> BLOCKS = new HashMap<>();
-    public static final Map<Entity, EntityHighlight> ENTITIES = new HashMap<>();
+    public static final Map<GameProfile, Queue<Highlight>> LAST_PINGS = new HashMap<>();
 
-    public static Optional<BlockHighlight> getBlockHighlight(BlockPos pos) {
-        return Optional.ofNullable(BLOCKS.get(pos));
+    private static Queue<Highlight> getHighlights(ServerPlayer player) {
+        return LAST_PINGS.getOrDefault(player.getGameProfile(), EmptyPriorityQueue.instance());
     }
 
-    public static Optional<EntityHighlight> getEntityHighlight(Entity entity) {
-        return Optional.ofNullable(ENTITIES.get(entity));
+    public static Optional<BlockHighlight> getBlockHighlight(ServerPlayer sourcePlayer, BlockPos pos) {
+        return getHighlights(sourcePlayer).stream()
+                .filter(highlight -> highlight instanceof BlockHighlight block && block.pos().equals(pos))
+                .map(highlight -> (BlockHighlight) highlight)
+                .findFirst();
+    }
+
+    public static Optional<EntityHighlight> getEntityHighlight(ServerPlayer sourcePlayer, Entity entity) {
+        return getHighlights(sourcePlayer).stream()
+                          .filter(highlight -> highlight instanceof EntityHighlight entityHighlight && entityHighlight.entity() == entity)
+                          .map(highlight -> (EntityHighlight) highlight)
+                          .findFirst();
     }
 
     public static void fadeEverything(ServerPlayer player) {
-        BLOCKS.values().stream()
-              .filter(highlight -> highlight.lie().getViewingPlayers().contains(player))
-              .forEach(highlight -> highlight.lie().removePlayer(player));
-        ENTITIES.values().stream()
-              .filter(highlight -> highlight.lie().getViewingPlayers().contains(player))
-              .forEach(highlight -> highlight.lie().removePlayer(player));
+        var playerQueue = LAST_PINGS.remove(player.getGameProfile());
+        if (playerQueue == null) return;
+
+        playerQueue.forEach(highlight -> highlight.lie().fade());
     }
 
-    public static void createBlock(ServerLevel level, Collection<ServerPlayer> players, BlockPos pos, boolean flashRed) {
+    public static void createBlock(ServerLevel level, ServerPlayer pinger, Collection<ServerPlayer> viewers, BlockPos pos, boolean flashRed) {
         BlockState state = level.getBlockState(pos);
 
         boolean startGlowing = !flashRed || getCurrentColour(level) != null;
@@ -55,29 +63,37 @@ public class LieManager {
                                     .build();
 
         var lie = EntityLie.builder(display)
-                           .onFade(LieManager::onBlockFade)
+                           .onFade((viewer, lie2) -> onFade(pinger, viewer, lie2))
                            .onTick(flashRed ? LieManager::flashRed : null)
-                           .createAndShow(players);
+                           .createAndShow(viewers);
 
-        var holder = new BlockHighlight(lie);
-        holder.refreshLifetime();
-
-        BLOCKS.put(pos, holder);
+        addHighlight(pinger, new BlockHighlight(pos, lie));
     }
 
-    public static void createEntity(ServerLevel level, Collection<ServerPlayer> players, Entity entity, boolean flashRed) {
+    public static void createEntity(ServerLevel level, ServerPlayer pinger, Collection<ServerPlayer> viewers, Entity entity, boolean flashRed) {
         var colour = flashRed ? getCurrentColour(level) : EyeSpyColours.getForEntity(entity);
 
         var lie = EntityGlowLie.builder(entity)
                                .colour(colour)
-                               .onFade(LieManager::onEntityFade)
+                               .onFade((viewer, lie2) -> onFade(pinger, viewer, lie2))
                                .onTick(flashRed ? LieManager::flashRed : null)
-                               .createAndShow(players);
+                               .createAndShow(viewers);
 
-        var holder = new EntityHighlight(lie);
-        holder.refreshLifetime();
+        addHighlight(pinger, new EntityHighlight(entity, lie));
+    }
 
-        ENTITIES.put(entity, holder);
+    private static void addHighlight(ServerPlayer pinger, Highlight highlight) {
+        var queue = LAST_PINGS.computeIfAbsent(pinger.getGameProfile(), prof -> new ArrayDeque<>());
+
+        queue.add(highlight);
+
+        highlight.refreshLifetime();
+
+        while (queue.size() > EyeSpy.CONFIG.instance().ping.maxPings) {
+            var oversized = queue.poll();
+            if (oversized == null) break;
+            oversized.lie().fade();
+        }
     }
 
     private static @Nullable ChatFormatting getCurrentColour(ServerLevel level) {
@@ -96,13 +112,24 @@ public class LieManager {
         lie.setGlowColour(getCurrentColour(player.serverLevel()));
     }
 
-    private static void onBlockFade(ServerPlayer ignored, EntityLie<Display.BlockDisplay> lie) {
-        if (lie.hasFaded())
-            BLOCKS.values().removeIf(highlight -> highlight.lie() == lie);
+    private static void onFade(ServerPlayer pinger, ServerPlayer viewer, Lie lie) {
+        if (lie.hasFaded() && pinger == viewer) {
+            var iter = getHighlights(pinger).iterator();
+            Highlight highlight;
+            while (iter.hasNext()) {
+                highlight = iter.next();
+                if (highlight.lie() == lie) {
+                    iter.remove();
+                }
+            }
+        }
     }
 
-    private static void onEntityFade(ServerPlayer ignored, EntityGlowLie<? extends Entity> lie) {
-        if (lie.hasFaded())
-            ENTITIES.values().removeIf(highlight -> highlight.lie() == lie);
+    public static void bump(ServerPlayer pinger, Highlight highlight) {
+        var highlights = getHighlights(pinger);
+        if (highlights.remove(highlight)) {
+            highlights.add(highlight);
+            highlight.refreshLifetime();
+        }
     }
 }
