@@ -53,6 +53,8 @@ public class Ping {
         ServerLevel level = pinger.serverLevel();
         Collection<ServerPlayer> viewing = PlayerLookup.around(level, pinger.getEyePosition(), EyeSpy.CONFIG.instance().ping.notifyRangeBlocks);
 
+        LieManager.resetBlockHighlightColours(pinger);
+
         var existing = LieManager.getBlockHighlight(pinger, blockHit.getBlockPos());
 
         if (existing.isPresent()) {
