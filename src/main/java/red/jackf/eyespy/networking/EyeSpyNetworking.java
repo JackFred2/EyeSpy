@@ -35,6 +35,6 @@ public class EyeSpyNetworking {
             if (Ping.canActivate(player)) Ping.activate(player);
         }));
 
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> HAS_CLIENT_MOD_INSTALLED.remove(handler.getOwner()));
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> HAS_CLIENT_MOD_INSTALLED.remove(handler.getPlayer().getGameProfile()));
     }
 }
