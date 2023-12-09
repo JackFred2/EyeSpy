@@ -12,17 +12,28 @@ import red.jackf.jackfredlib.api.colour.Colour;
 import red.jackf.jackfredlib.api.colour.Colours;
 import red.jackf.jackfredlib.api.lying.Debris;
 import red.jackf.jackfredlib.api.lying.entity.EntityLie;
+import red.jackf.jackfredlib.api.lying.entity.EntityUtils;
 import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
 import red.jackf.jackfredlib.mixins.lying.entity.DisplayAccessor;
 
 import java.util.Collection;
 
 public final class BlockHighlight implements Highlight {
+    private final ServerLevel level;
     private final BlockPos pos;
     private final boolean warning;
     private final EntityLie<Display.BlockDisplay> lie;
     private Colour baseColour = Colours.WHITE;
     private long lastRefreshed = -1;
+
+    public static BlockHighlight create(
+            ServerLevel level,
+            BlockPos pos,
+            ServerPlayer pinger,
+            Collection<ServerPlayer> viewers,
+            boolean warning) {
+        return new BlockHighlight(level, pos, pinger, viewers, warning);
+    }
 
     private BlockHighlight(
             ServerLevel level,
@@ -30,10 +41,11 @@ public final class BlockHighlight implements Highlight {
             ServerPlayer pinger,
             Collection<ServerPlayer> viewers,
             boolean warning) {
+        this.level = level;
         this.pos = pos;
         this.warning = warning;
         this.lie = EntityLie.builder(makeDisplay(level, pos, warning))
-                            .onTick(warning ? this::flashWarning : null)
+                            .onTick(this::tick)
                             .onFade((viewer, lie2) -> LieManager.onFade(pinger, viewer, this))
                             .createAndShow(viewers);
 
@@ -57,18 +69,15 @@ public final class BlockHighlight implements Highlight {
                              .build();
     }
 
-    public static BlockHighlight create(
-            ServerLevel level,
-            BlockPos pos,
-            ServerPlayer pinger,
-            Collection<ServerPlayer> viewers,
-            boolean warning) {
-        return new BlockHighlight(level, pos, pinger, viewers, warning);
-    }
-
-    private void flashWarning(ServerPlayer player, EntityLie<Display.BlockDisplay> lie) {
+    private void flashWarning(ServerPlayer player) {
         long timeSinceLast = player.level().getGameTime() - this.lastRefreshed;
         this.lie.entity().setGlowingTag((timeSinceLast / Constants.FLASH_INTERVAL) % 2 == 0);
+    }
+
+    private void tick(ServerPlayer player, EntityLie<Display.BlockDisplay> lie) {
+        if (this.warning) this.flashWarning(player);
+
+        EntityUtils.setDisplayBlockState(this.lie.entity(), this.level.getBlockState(this.pos));
     }
 
     public void fade() {
