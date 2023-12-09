@@ -19,6 +19,7 @@ import java.util.Collection;
 
 public final class BlockHighlight implements Highlight {
     private final BlockPos pos;
+    private final boolean warning;
     private final EntityLie<Display.BlockDisplay> lie;
     private Colour baseColour = Colours.WHITE;
     private long lastRefreshed = -1;
@@ -30,6 +31,7 @@ public final class BlockHighlight implements Highlight {
             Collection<ServerPlayer> viewers,
             boolean warning) {
         this.pos = pos;
+        this.warning = warning;
         this.lie = EntityLie.builder(makeDisplay(level, pos, warning))
                             .onTick(warning ? this::flashWarning : null)
                             .onFade((viewer, lie2) -> LieManager.onFade(pinger, viewer, this))
@@ -92,7 +94,7 @@ public final class BlockHighlight implements Highlight {
     }
 
     public void setLatestColour() {
-        // TODO make accessor method for JFLib Lying colour
-        ((DisplayAccessor) this.lie.entity()).jflib$setGlowColorOverride(this.baseColour.lerp(Colours.WHITE, 0.4f).toARGB());
+        if (this.warning) this.setNormalColour();
+        else ((DisplayAccessor) this.lie.entity()).jflib$setGlowColorOverride(this.baseColour.lerp(Colours.WHITE, 0.4f).toARGB());
     }
 }
