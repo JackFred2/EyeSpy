@@ -8,15 +8,19 @@ import net.minecraft.world.entity.Display;
 import net.minecraft.world.level.block.state.BlockState;
 import red.jackf.eyespy.EyeSpy;
 import red.jackf.eyespy.EyeSpyColours;
+import red.jackf.jackfredlib.api.colour.Colour;
+import red.jackf.jackfredlib.api.colour.Colours;
 import red.jackf.jackfredlib.api.lying.Debris;
 import red.jackf.jackfredlib.api.lying.entity.EntityLie;
 import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
+import red.jackf.jackfredlib.mixins.lying.entity.DisplayAccessor;
 
 import java.util.Collection;
 
 public final class BlockHighlight implements Highlight {
     private final BlockPos pos;
     private final EntityLie<Display.BlockDisplay> lie;
+    private Colour baseColour = Colours.WHITE;
     private long lastRefreshed = -1;
 
     private BlockHighlight(
@@ -32,19 +36,22 @@ public final class BlockHighlight implements Highlight {
                             .createAndShow(viewers);
 
         this.refreshLifetime();
+        this.setLatestColour();
     }
 
-    private static Display.BlockDisplay makeDisplay(ServerLevel level, BlockPos pos, boolean warning) {
+    private Display.BlockDisplay makeDisplay(ServerLevel level, BlockPos pos, boolean warning) {
         BlockState state = level.getBlockState(pos);
 
         //noinspection DataFlowIssue
+        this.baseColour = warning ? Colour.fromInt(ChatFormatting.RED.getColor()) : EyeSpyColours.getForBlock(state);
+
         return EntityBuilders.blockDisplay(level)
                              .state(state)
                              .positionCentered(pos)
                              .scaleAndCenter(0.98f)
                              .brightness(15, 15)
                              .viewRangeModifier(5f)
-                             .glowing(true, warning ? ChatFormatting.RED.getColor() : EyeSpyColours.getForBlock(state).toARGB())
+                             .glowing(true, baseColour)
                              .build();
     }
 
@@ -77,5 +84,15 @@ public final class BlockHighlight implements Highlight {
 
     public BlockPos pos() {
         return pos;
+    }
+
+    public void setNormalColour() {
+        // TODO make accessor method for JFLib Lying colour
+        ((DisplayAccessor) this.lie.entity()).jflib$setGlowColorOverride(this.baseColour.toARGB());
+    }
+
+    public void setLatestColour() {
+        // TODO make accessor method for JFLib Lying colour
+        ((DisplayAccessor) this.lie.entity()).jflib$setGlowColorOverride(this.baseColour.lerp(Colours.WHITE, 0.4f).toARGB());
     }
 }

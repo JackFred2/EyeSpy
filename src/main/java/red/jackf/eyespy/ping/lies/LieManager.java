@@ -35,6 +35,14 @@ public class LieManager {
         addHighlight(pinger, BlockHighlight.create(level, pos, pinger, viewers, warning));
     }
 
+    public static void resetBlockHighlightColours(ServerPlayer pinger) {
+        // latest highlight is brighter, darken old ones here
+        getHighlights(pinger).stream()
+                             .filter(highlight -> highlight instanceof BlockHighlight)
+                             .map(highlight -> (BlockHighlight) highlight)
+                             .forEach(BlockHighlight::setNormalColour);
+    }
+
     public static void createEntity(ServerPlayer pinger, Collection<ServerPlayer> viewers, Entity entity, boolean warning) {
         addHighlight(pinger, EntityHighlight.create(entity, pinger, viewers, warning));
     }
@@ -52,10 +60,12 @@ public class LieManager {
     }
 
     public static void bump(ServerPlayer pinger, Highlight highlight) {
+        // move to back of queue
         var highlights = getHighlights(pinger);
         if (highlights.remove(highlight)) {
             highlights.add(highlight);
             highlight.refreshLifetime();
+            if (highlight instanceof BlockHighlight block) block.setLatestColour();
         }
     }
 
