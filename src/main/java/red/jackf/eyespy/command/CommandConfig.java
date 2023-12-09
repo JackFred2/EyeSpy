@@ -355,6 +355,14 @@ public class CommandConfig {
                                config -> config.ping.lifetimeTicks,
                                (config, newVal) -> config.ping.lifetimeTicks = newVal));
 
+        root.then(makeIntRange("maxPings",
+                               "ping.maxPings",
+                               WikiPage.PING,
+                               1,
+                               32,
+                               config -> config.ping.maxPings,
+                               (config, newVal) -> config.ping.maxPings = newVal));
+
         return root;
     }
 

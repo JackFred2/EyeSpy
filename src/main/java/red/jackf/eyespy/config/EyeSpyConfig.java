@@ -46,6 +46,12 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
                 Range: [60, 400] [3 seconds, 20 seconds]
                 Default: 160 (8 seconds)""")
         public int lifetimeTicks = 160;
+
+        @Comment("""
+                Maximum number of pings allowed per-player at a single point in time.
+                Range: [1, 32]
+                Default: 5""")
+        public int maxPings = 5;
     }
 
     @Comment("""
