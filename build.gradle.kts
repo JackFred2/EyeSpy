@@ -170,6 +170,8 @@ tasks.named<Jar>("sourcesJar") {
 }
 
 tasks.jar {
+	duplicatesStrategy = DuplicatesStrategy.WARN
+
 	from("LICENSE") {
 		rename { "${it}_${properties["archivesBaseName"]}"}
 	}
