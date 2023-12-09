@@ -185,7 +185,7 @@ fun makeChangelogPrologue(): String {
 		|  - JackFredLib: Config: ${properties["jflib_config_version"]}
 		|  - JackFredLib: Colour: ${properties["jflib_colour_version"]}
 		|  - JackFredLib: Lying: ${properties["jflib_lying_version"]}
-		|  - JackFredLib: Toasts: ${properties["jflib_lying_version"]}
+		|  - JackFredLib: Toasts: ${properties["jflib_toasts_version"]}
 		|  """.trimMargin()
 }
 
