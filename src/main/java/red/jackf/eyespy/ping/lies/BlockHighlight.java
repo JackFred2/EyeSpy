@@ -14,7 +14,6 @@ import red.jackf.jackfredlib.api.lying.Debris;
 import red.jackf.jackfredlib.api.lying.entity.EntityLie;
 import red.jackf.jackfredlib.api.lying.entity.EntityUtils;
 import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
-import red.jackf.jackfredlib.mixins.lying.entity.DisplayAccessor;
 
 import java.util.Collection;
 
@@ -98,12 +97,11 @@ public final class BlockHighlight implements Highlight {
     }
 
     public void setNormalColour() {
-        // TODO make accessor method for JFLib Lying colour
-        ((DisplayAccessor) this.lie.entity()).jflib$setGlowColorOverride(this.baseColour.toARGB());
+        EntityUtils.setDisplayGlowOverride(this.lie.entity(), this.baseColour);
     }
 
     public void setLatestColour() {
         if (this.warning) this.setNormalColour();
-        else ((DisplayAccessor) this.lie.entity()).jflib$setGlowColorOverride(this.baseColour.lerp(Colours.WHITE, 0.4f).toARGB());
+        else EntityUtils.setDisplayGlowOverride(this.lie.entity(), this.baseColour.lerp(Colours.WHITE, 0.4f));
     }
 }
