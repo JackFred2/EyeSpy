@@ -30,7 +30,8 @@ public final class EntityHighlight implements Highlight {
                                 .onTick(warning ? this::flashWarning : null)
                                 .onFade((viewer, lie2) -> {
                                     LieManager.onFade(pinger, viewer, this);
-                                    texts.get(viewer).stop();
+                                    var playerText = this.texts.get(viewer);
+                                    if (playerText != null) playerText.stop();
                                 })
                                 .createAndShow(viewers);
 

@@ -3,7 +3,6 @@ package red.jackf.eyespy.ping.lies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -12,7 +11,6 @@ import red.jackf.eyespy.EyeSpy;
 import red.jackf.eyespy.EyeSpyTexts;
 import red.jackf.eyespy.lies.AnchoredText;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public class PingLieText extends AnchoredText {
@@ -32,19 +30,21 @@ public class PingLieText extends AnchoredText {
     }
 
     private static Component getEntityText(ServerPlayer viewer, Entity entity) {
-        MutableComponent text = null;
-        if (EyeSpy.CONFIG.instance().ping.showDistanceText)
-            text = EyeSpyTexts.distance(viewer, entity.position());
-        if (EyeSpy.CONFIG.instance().ping.showDescriptionText) {
-            var description = EyeSpyTexts.entity(entity);
-            if (text != null) {
-                return text.append(CommonComponents.NEW_LINE).append(description);
+        boolean distance = EyeSpy.CONFIG.instance().ping.showDistanceText;
+        boolean description = EyeSpy.CONFIG.instance().ping.showDescriptionText;
+        if (distance) {
+            if (description) {
+                return EyeSpyTexts.distance(viewer, entity.position()).append(CommonComponents.NEW_LINE).append(EyeSpyTexts.entity(entity));
             } else {
-                return description;
+                return EyeSpyTexts.distance(viewer, entity.position());
+            }
+        } else {
+            if (description) {
+                return EyeSpyTexts.entity(entity);
+            } else { // hopefully never happens but never know
+                return CommonComponents.EMPTY;
             }
         }
-
-        return Objects.requireNonNull(text);
     }
 
     protected PingLieText(ServerPlayer viewer, BlockPos pos, BlockState state) {
@@ -54,19 +54,21 @@ public class PingLieText extends AnchoredText {
     }
 
     private static Component getBlockText(ServerPlayer viewer, BlockPos pos, BlockState state) {
-        MutableComponent text = null;
-        if (EyeSpy.CONFIG.instance().ping.showDistanceText)
-            text = EyeSpyTexts.distance(viewer, pos.getCenter());
-        if (EyeSpy.CONFIG.instance().ping.showDescriptionText) {
-            var description = EyeSpyTexts.block(state);
-            if (text != null) {
-                return text.append(CommonComponents.NEW_LINE).append(description);
+        boolean distance = EyeSpy.CONFIG.instance().ping.showDistanceText;
+        boolean description = EyeSpy.CONFIG.instance().ping.showDescriptionText;
+        if (distance) {
+            if (description) {
+                return EyeSpyTexts.distance(viewer, pos.getCenter()).append(CommonComponents.NEW_LINE).append(EyeSpyTexts.block(state));
             } else {
-                return description;
+                return EyeSpyTexts.distance(viewer, pos.getCenter());
+            }
+        } else {
+            if (description) {
+                return EyeSpyTexts.block(state);
+            } else { // hopefully never happens but never know
+                return CommonComponents.EMPTY;
             }
         }
-
-        return Objects.requireNonNull(text);
     }
 
     @Override
