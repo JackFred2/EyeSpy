@@ -96,4 +96,8 @@ public class Ping {
         Sounds.playEntity(viewing, entityHit);
         LieManager.createEntity(pinger, viewing, entityHit.getEntity(), false);
     }
+
+    public static boolean pingTextEnabled() {
+        return EyeSpy.CONFIG.instance().ping.showDescriptionText || EyeSpy.CONFIG.instance().ping.showDistanceText;
+    }
 }
