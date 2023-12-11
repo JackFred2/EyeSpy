@@ -1,6 +1,8 @@
 package red.jackf.eyespy.rangefinding;
 
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.item.Items;
@@ -43,17 +45,23 @@ public class RangefindLie extends AnchoredText {
     }
 
     private Component makeBlockText(BlockHitResult hit) {
-        if (!EyeSpy.CONFIG.instance().rangefinder.showBlockName)
-            return EyeSpyTexts.distance(this.viewer, hit.getLocation());
-        else
-            return EyeSpyTexts.block(this.viewer, hit.getLocation(), this.viewer.serverLevel().getBlockState(hit.getBlockPos()));
+        MutableComponent text = EyeSpyTexts.distance(this.viewer, hit.getLocation());
+
+        if (EyeSpy.CONFIG.instance().rangefinder.showBlockName)
+            text = text.append(CommonComponents.NEW_LINE)
+                       .append(EyeSpyTexts.block(this.viewer.serverLevel().getBlockState(hit.getBlockPos())));
+
+        return text;
     }
 
     private Component makeEntityText(EntityHitResult hit) {
-        if (!EyeSpy.CONFIG.instance().rangefinder.showEntityName)
-            return EyeSpyTexts.distance(this.viewer, hit.getLocation());
-        else
-            return EyeSpyTexts.entity(this.viewer, hit.getLocation(), hit.getEntity());
+        MutableComponent text = EyeSpyTexts.distance(this.viewer, hit.getLocation());
+
+        if (EyeSpy.CONFIG.instance().rangefinder.showEntityName)
+            text = text.append(CommonComponents.NEW_LINE)
+                       .append(EyeSpyTexts.entity(hit.getEntity()));
+
+        return text;
     }
 
     public static void create(ServerPlayer player) {
