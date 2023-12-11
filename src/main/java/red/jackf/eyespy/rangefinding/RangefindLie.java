@@ -5,83 +5,57 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import org.joml.Vector3f;
+import net.minecraft.world.phys.Vec3;
 import red.jackf.eyespy.EyeSpy;
 import red.jackf.eyespy.EyeSpyColours;
+import red.jackf.eyespy.lies.AnchoredText;
 import red.jackf.eyespy.mixins.EyeSpyEntityInvoker;
 import red.jackf.eyespy.raycasting.Raycasting;
 import red.jackf.jackfredlib.api.lying.entity.EntityLie;
-import red.jackf.jackfredlib.api.lying.entity.EntityUtils;
-import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
 
-public class RangefindLie {
-    private static final float MAX_DISTANCE = 3f;
-    private static final float OFFSET = 0.75f;
-
-    private static final long REFRESH_INTERVAL_TICKS = 4L;
-
-    private final ServerPlayer player;
-    private final EntityLie<Display.TextDisplay> lie;
-
-    private static float getScale() {
-        return 0.020f * MAX_DISTANCE * EyeSpy.CONFIG.instance().rangefinder.textScale;
+public class RangefindLie extends AnchoredText {
+    protected RangefindLie(ServerPlayer viewer) {
+        super(viewer, 2f, -0.75f);
     }
 
-    private RangefindLie(ServerPlayer player) {
-        this.player = player;
-        this.lie = EntityLie.builder(EntityBuilders.textDisplay(player.serverLevel())
-                                                   .billboard(Display.BillboardConstraints.FIXED)
-                                                   .backgroundColour(0x80, 0x00, 0x00, 0x00)
-                                                   .seeThrough(false)
-                                                   .textAlign(Display.TextDisplay.Align.CENTER)
-                                                   .brightness(15, 15)
-                                                   .teleportInterpolationDuration(1)
-                                                   .position(player.getEyePosition().add(player.getLookAngle().scale(MAX_DISTANCE)))
-                                                   .build())
-                            .onTick(this::tickLie)
-                            .createAndShow(player);
-
-        this.refreshPosAngleAndScale();
+    @Override
+    protected Vec3 getTargetPos() {
+        return this.viewer.getEyePosition().add(this.viewer.getLookAngle().scale(RAYCAST_DISTANCE_CURVE_FACTOR));
     }
 
-    private void tickLie(ServerPlayer player, EntityLie<Display.TextDisplay> lie) {
-        if (this.player.isRemoved() || !this.player.getUseItem().is(Items.SPYGLASS) || this.player.hasDisconnected()) {
+    @Override
+    protected Component getCurrentMessage() {
+        HitResult hit = Raycasting.cast(viewer);
+        return switch (hit.getType()) {
+            case MISS -> Component.translatable("eyespy.rangefinder.outOfRange");
+            case BLOCK -> makeBlockText((BlockHitResult) hit);
+            case ENTITY -> makeEntityText((EntityHitResult) hit);
+        };
+    }
+
+    protected void tick(ServerPlayer viewer, EntityLie<Display.TextDisplay> lie) {
+        if (this.viewer.isRemoved() || !this.viewer.getUseItem().is(Items.SPYGLASS) || this.viewer.hasDisconnected()) {
             this.stop();
         } else {
-            this.refreshPosAngleAndScale();
-
-            ServerLevel level = this.player.serverLevel();
-
-            if ((level.getGameTime() & REFRESH_INTERVAL_TICKS) == 0) {
-                HitResult hit = Raycasting.cast(player);
-                Component text = switch (hit.getType()) {
-                    case MISS -> Component.translatable("eyespy.rangefinder.outOfRange");
-                    case BLOCK -> makeBlockText((BlockHitResult) hit);
-                    case ENTITY -> makeEntityText((EntityHitResult) hit);
-                };
-
-                EntityUtils.setDisplayText(this.lie.entity(), text);
-            }
+            super.tick(viewer, lie);
         }
     }
 
     private MutableComponent makeDistanceText(HitResult hit) {
-        return Component.literal("%.2f".formatted(hit.getLocation().distanceTo(this.player.getEyePosition())) + "m");
+        return Component.literal("%.2f".formatted(hit.getLocation().distanceTo(this.viewer.getEyePosition())) + "m");
     }
 
     private Component makeBlockText(BlockHitResult hit) {
         if (!EyeSpy.CONFIG.instance().rangefinder.showBlockName) return makeDistanceText(hit);
 
-        BlockState state = this.player.serverLevel().getBlockState(hit.getBlockPos());
+        BlockState state = this.viewer.serverLevel().getBlockState(hit.getBlockPos());
         Style style = EyeSpy.CONFIG.instance().rangefinder.useColours ?
                 Style.EMPTY.withColor(EyeSpyColours.getForBlock(state).toARGB()) : Style.EMPTY;
 
@@ -107,29 +81,6 @@ public class RangefindLie {
         return makeDistanceText(hit)
                 .append(CommonComponents.NEW_LINE)
                 .append(name);
-    }
-
-    private void stop() {
-        this.lie.fade();
-    }
-
-    private void refreshPosAngleAndScale() {
-        // dilemma: if we have enable see-through, then it renders behind fluids, but if it's false it doesn't render in
-        // terrain. solution: we dont enable it but hopefully bring it in front of any terrain
-        float collisionDistance = (float) Raycasting.pick(player, MAX_DISTANCE * 2, true)
-                                                    .getLocation()
-                                                    .distanceTo(this.player.getEyePosition());
-        float distance = Mth.clamp(collisionDistance / 2, 0.1f, MAX_DISTANCE);
-        float scaleFactorRelativeToMax = distance / MAX_DISTANCE;
-
-        this.lie.entity().setPos(this.player.getEyePosition().add(this.player.getLookAngle().scale(distance)));
-        EntityUtils.updateDisplayTransformation(this.lie.entity(),
-                                                new Vector3f(0, scaleFactorRelativeToMax * -getScale() * OFFSET, 0),
-                                                null,
-                                                new Vector3f(scaleFactorRelativeToMax * getScale()),
-                                                null
-        );
-        EntityUtils.face(this.lie.entity(), this.player.getEyePosition());
     }
 
     public static void create(ServerPlayer player) {
