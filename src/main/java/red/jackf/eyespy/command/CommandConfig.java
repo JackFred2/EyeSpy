@@ -363,6 +363,18 @@ public class CommandConfig {
                                config -> config.ping.maxPings,
                                (config, newVal) -> config.ping.maxPings = newVal));
 
+        root.then(makeBoolean("showDescriptionText",
+                              "ping.showDescriptionText",
+                              WikiPage.PING,
+                              config -> config.ping.showDescriptionText,
+                              (config, newVal) -> config.ping.showDescriptionText = newVal));
+
+        root.then(makeBoolean("showDistanceText",
+                              "ping.showDistanceText",
+                              WikiPage.PING,
+                              config -> config.ping.showDistanceText,
+                              (config, newVal) -> config.ping.showDistanceText = newVal));
+
         return root;
     }
 

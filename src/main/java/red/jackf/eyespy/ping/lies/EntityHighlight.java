@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import red.jackf.eyespy.EyeSpy;
 import red.jackf.eyespy.EyeSpyColours;
+import red.jackf.eyespy.ping.Ping;
 import red.jackf.jackfredlib.api.lying.Debris;
 import red.jackf.jackfredlib.api.lying.glowing.EntityGlowLie;
 
@@ -33,9 +34,10 @@ public final class EntityHighlight implements Highlight {
                                 })
                                 .createAndShow(viewers);
 
-        for (ServerPlayer viewer : viewers) {
-            texts.put(viewer, new PingLieText(viewer, entity));
-        }
+        if (Ping.pingTextEnabled())
+            for (ServerPlayer viewer : viewers) {
+                texts.put(viewer, new PingLieText(viewer, entity));
+            }
 
         this.refreshLifetime();
     }

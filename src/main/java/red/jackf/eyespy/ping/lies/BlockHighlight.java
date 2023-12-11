@@ -8,6 +8,7 @@ import net.minecraft.world.entity.Display;
 import net.minecraft.world.level.block.state.BlockState;
 import red.jackf.eyespy.EyeSpy;
 import red.jackf.eyespy.EyeSpyColours;
+import red.jackf.eyespy.ping.Ping;
 import red.jackf.jackfredlib.api.colour.Colour;
 import red.jackf.jackfredlib.api.colour.Colours;
 import red.jackf.jackfredlib.api.lying.Debris;
@@ -54,9 +55,10 @@ public final class BlockHighlight implements Highlight {
                             })
                             .createAndShow(viewers);
 
-        for (ServerPlayer viewer : viewers) {
-            texts.put(viewer, new PingLieText(viewer, pos, level.getBlockState(pos)));
-        }
+        if (Ping.pingTextEnabled())
+            for (ServerPlayer viewer : viewers) {
+                texts.put(viewer, new PingLieText(viewer, pos, level.getBlockState(pos)));
+            }
 
         this.refreshLifetime();
         this.setLatestColour();
