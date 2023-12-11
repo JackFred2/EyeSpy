@@ -21,7 +21,7 @@ public class RangefindLie extends AnchoredText {
 
     @Override
     protected Vec3 getTargetPos() {
-        return this.viewer.getEyePosition().add(this.viewer.getLookAngle().scale(RAYCAST_DISTANCE_CURVE_FACTOR));
+        return this.viewer.getEyePosition().add(this.viewer.getLookAngle().scale(2f));
     }
 
     @Override

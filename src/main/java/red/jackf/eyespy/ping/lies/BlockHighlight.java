@@ -16,12 +16,15 @@ import red.jackf.jackfredlib.api.lying.entity.EntityUtils;
 import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class BlockHighlight implements Highlight {
     private final ServerLevel level;
     private final BlockPos pos;
     private final boolean warning;
     private final EntityLie<Display.BlockDisplay> lie;
+    private final Map<ServerPlayer, PingLieText> texts = new HashMap<>();
     private Colour baseColour = Colours.WHITE;
     private long lastRefreshed = -1;
 
@@ -45,8 +48,15 @@ public final class BlockHighlight implements Highlight {
         this.warning = warning;
         this.lie = EntityLie.builder(makeDisplay(level, pos, warning))
                             .onTick(this::tick)
-                            .onFade((viewer, lie2) -> LieManager.onFade(pinger, viewer, this))
+                            .onFade((viewer, lie2) -> {
+                                LieManager.onFade(pinger, viewer, this);
+                                this.texts.get(viewer).stop();
+                            })
                             .createAndShow(viewers);
+
+        for (ServerPlayer viewer : viewers) {
+            texts.put(viewer, new PingLieText(viewer, pos, level.getBlockState(pos)));
+        }
 
         this.refreshLifetime();
         this.setLatestColour();
@@ -81,6 +91,7 @@ public final class BlockHighlight implements Highlight {
 
     public void fade() {
         this.lie.fade();
+        this.texts.values().forEach(PingLieText::stop);
     }
 
     public void refreshLifetime() {
