@@ -4,6 +4,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Display;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
@@ -59,7 +60,7 @@ public abstract class AnchoredText {
 
     protected abstract Component getCurrentMessage();
 
-    protected void stop() {
+    public void stop() {
         this.lie.fade();
     }
 
@@ -72,22 +73,28 @@ public abstract class AnchoredText {
     }
 
     private float getScale() {
-        return 0.020f * maxDistanceFromPlayer * EyeSpy.CONFIG.instance().rangefinder.textScale;
+        return (this.viewer.getUseItem().is(Items.SPYGLASS) ? 0.020f : 0.2f) * maxDistanceFromPlayer * EyeSpy.CONFIG.instance().rangefinder.textScale;
     }
 
     private void refreshPosAndScale() {
         float maxDistance = maxDistanceFromPlayer;
         float scale = getScale();
 
+        Vec3 targetOffsetToPlayer = getTargetPos().subtract(this.viewer.getEyePosition());
+        double targetOffsetToPlayerLength = targetOffsetToPlayer.length();
+        Vec3 targetOffsetToPlayerCutoff = targetOffsetToPlayerLength < maxDistance ? targetOffsetToPlayer : targetOffsetToPlayer.scale(maxDistance / targetOffsetToPlayerLength);
+
         // dilemma: if we have enable see-through, then it renders behind fluids, but if it's false it doesn't render in
         // terrain. solution: we dont enable it but hopefully bring it in front of any terrain
-        float collisionDistance = (float) Raycasting.pick(viewer, getTargetPos(), true)
+        float collisionDistance = (float) Raycasting.pick(viewer, this.viewer.getEyePosition().add(targetOffsetToPlayerCutoff.scale(RAYCAST_DISTANCE_CURVE_FACTOR)), true)
                                                     .getLocation()
                                                     .distanceTo(this.viewer.getEyePosition());
         float distance = Mth.clamp(collisionDistance / RAYCAST_DISTANCE_CURVE_FACTOR, 0.1f, maxDistance);
         float scaleFactorRelativeToMax = distance / maxDistance;
 
-        Vec3 thisTickOffset = this.viewer.getEyePosition().add(this.viewer.getLookAngle().scale(distance)).subtract(this.lie.entity().position());
+        Vec3 thisTickOffset = this.viewer.getEyePosition()
+                                         .add(targetOffsetToPlayerCutoff.scale(distance / targetOffsetToPlayerCutoff.length()))
+                                         .subtract(this.lie.entity().position());
 
         Vector3f translate = thisTickOffset.toVector3f().add(new Vector3f(0, scaleFactorRelativeToMax * scale * yOffset, 0));
 

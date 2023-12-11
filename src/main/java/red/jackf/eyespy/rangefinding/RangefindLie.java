@@ -1,7 +1,6 @@
 package red.jackf.eyespy.rangefinding;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.item.Items;
@@ -22,7 +21,7 @@ public class RangefindLie extends AnchoredText {
 
     @Override
     protected Vec3 getTargetPos() {
-        return this.viewer.getEyePosition().add(this.viewer.getLookAngle().scale(RAYCAST_DISTANCE_CURVE_FACTOR));
+        return this.viewer.getEyePosition().add(this.viewer.getLookAngle().scale(2f));
     }
 
     @Override
