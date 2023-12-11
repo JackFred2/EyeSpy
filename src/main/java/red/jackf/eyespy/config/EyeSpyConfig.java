@@ -52,6 +52,18 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
                 Range: [1, 32]
                 Default: 5""")
         public int maxPings = 5;
+
+        @Comment("""
+                Whether to show description text (block and entity names) for pings.
+                Options: true, false
+                Default: true""")
+        public boolean showDescriptionText = true;
+
+        @Comment("""
+                Whether to show distance text for pings.
+                Options: true, false
+                Default: true""")
+        public boolean showDistanceText = true;
     }
 
     @Comment("""
