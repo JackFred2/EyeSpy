@@ -1,22 +1,17 @@
 package red.jackf.eyespy.rangefinding;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import red.jackf.eyespy.EyeSpy;
-import red.jackf.eyespy.EyeSpyColours;
+import red.jackf.eyespy.EyeSpyTexts;
 import red.jackf.eyespy.lies.AnchoredText;
-import red.jackf.eyespy.mixins.EyeSpyEntityInvoker;
 import red.jackf.eyespy.raycasting.Raycasting;
 import red.jackf.jackfredlib.api.lying.entity.EntityLie;
 
@@ -48,39 +43,18 @@ public class RangefindLie extends AnchoredText {
         }
     }
 
-    private MutableComponent makeDistanceText(HitResult hit) {
-        return Component.literal("%.2f".formatted(hit.getLocation().distanceTo(this.viewer.getEyePosition())) + "m");
-    }
-
     private Component makeBlockText(BlockHitResult hit) {
-        if (!EyeSpy.CONFIG.instance().rangefinder.showBlockName) return makeDistanceText(hit);
-
-        BlockState state = this.viewer.serverLevel().getBlockState(hit.getBlockPos());
-        Style style = EyeSpy.CONFIG.instance().rangefinder.useColours ?
-                Style.EMPTY.withColor(EyeSpyColours.getForBlock(state).toARGB()) : Style.EMPTY;
-
-        return makeDistanceText(hit)
-                .append(CommonComponents.NEW_LINE)
-                .append(state.getBlock().getName().setStyle(style));
+        if (!EyeSpy.CONFIG.instance().rangefinder.showBlockName)
+            return EyeSpyTexts.distance(this.viewer, hit.getLocation());
+        else
+            return EyeSpyTexts.block(this.viewer, hit.getLocation(), this.viewer.serverLevel().getBlockState(hit.getBlockPos()));
     }
 
     private Component makeEntityText(EntityHitResult hit) {
-        if (!EyeSpy.CONFIG.instance().rangefinder.showEntityName) return makeDistanceText(hit);
-
-        Style style = EyeSpy.CONFIG.instance().rangefinder.useColours ?
-                Style.EMPTY.withColor(EyeSpyColours.getForEntity(hit.getEntity())) : Style.EMPTY;
-        Component name = ((EyeSpyEntityInvoker) hit.getEntity()).eyespy$getTypeName().copy().setStyle(style);
-
-        if (hit.getEntity().hasCustomName()) {
-            name = Component.literal("").setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE))
-                            .append(hit.getEntity().getCustomName())
-                            .append(" (")
-                            .append(name)
-                            .append(")");
-        }
-        return makeDistanceText(hit)
-                .append(CommonComponents.NEW_LINE)
-                .append(name);
+        if (!EyeSpy.CONFIG.instance().rangefinder.showEntityName)
+            return EyeSpyTexts.distance(this.viewer, hit.getLocation());
+        else
+            return EyeSpyTexts.entity(this.viewer, hit.getLocation(), hit.getEntity());
     }
 
     public static void create(ServerPlayer player) {
