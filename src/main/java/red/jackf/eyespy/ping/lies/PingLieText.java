@@ -22,11 +22,15 @@ public class PingLieText extends AnchoredText {
     }
 
     protected PingLieText(ServerPlayer viewer, Entity entity) {
-        this(viewer, () -> entity.position().add(0, entity.getBbHeight() + 1f, 0), () -> EyeSpyTexts.entity(viewer, entity.position(), entity));
+        this(viewer,
+             () -> entity.position().add(0, entity.getBbHeight() + 0.5f, 0),
+             () -> EyeSpyTexts.entity(viewer, entity.position(), entity));
     }
 
     protected PingLieText(ServerPlayer viewer, BlockPos pos, BlockState state) {
-        this(viewer, () -> pos.getCenter().add(0, 1, 0), () -> EyeSpyTexts.block(viewer, pos.getCenter(), state));
+        this(viewer,
+             () -> pos.getCenter().add(0, 1f, 0),
+             () -> EyeSpyTexts.block(viewer, pos.getCenter(), state));
     }
 
     @Override
