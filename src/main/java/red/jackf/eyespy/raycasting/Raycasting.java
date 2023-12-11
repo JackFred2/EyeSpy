@@ -48,11 +48,17 @@ public class Raycasting {
         return pick(player, EyeSpy.CONFIG.instance().maxRangeBlocks, false);
     }
 
+    public static BlockHitResult pick(ServerPlayer player, Vec3 to, boolean hitFluids) {
+        Vec3 from = player.getEyePosition();
+
+        return player.getLevel().clip(new CustomClipContext(from, to, player, hitFluids));
+    }
+
     public static BlockHitResult pick(ServerPlayer player, double maxDistance, boolean hitFluids) {
         Vec3 from = player.getEyePosition();
         Vec3 direction = player.getViewVector(1);
         Vec3 to = from.add(direction.x * maxDistance, direction.y * maxDistance, direction.z * maxDistance);
 
-        return player.getLevel().clip(new CustomClipContext(from, to, player, hitFluids));
+        return pick(player, to, hitFluids);
     }
 }
