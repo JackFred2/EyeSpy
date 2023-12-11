@@ -9,10 +9,13 @@ import red.jackf.jackfredlib.api.lying.Debris;
 import red.jackf.jackfredlib.api.lying.glowing.EntityGlowLie;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class EntityHighlight implements Highlight {
     private final Entity entity;
     private final EntityGlowLie<? extends Entity> lie;
+    private final Map<ServerPlayer, PingLieText> texts = new HashMap<>();
     private long lastRefreshed = -1;
 
     private EntityHighlight(
@@ -24,8 +27,15 @@ public final class EntityHighlight implements Highlight {
         this.lie = EntityGlowLie.builder(entity)
                                 .colour(warning ? ChatFormatting.RED : EyeSpyColours.getForEntity(entity))
                                 .onTick(warning ? this::flashWarning : null)
-                                .onFade((viewer, lie2) -> LieManager.onFade(pinger, viewer, this))
+                                .onFade((viewer, lie2) -> {
+                                    LieManager.onFade(pinger, viewer, this);
+                                    texts.get(viewer).stop();
+                                })
                                 .createAndShow(viewers);
+
+        for (ServerPlayer viewer : viewers) {
+            texts.put(viewer, new PingLieText(viewer, entity));
+        }
 
         this.refreshLifetime();
     }
@@ -45,6 +55,7 @@ public final class EntityHighlight implements Highlight {
 
     public void fade() {
         this.lie.fade();
+        texts.values().forEach(PingLieText::stop);
     }
 
     public void refreshLifetime() {
