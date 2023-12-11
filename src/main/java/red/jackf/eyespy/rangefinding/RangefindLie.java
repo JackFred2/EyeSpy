@@ -49,7 +49,7 @@ public class RangefindLie extends AnchoredText {
 
         if (EyeSpy.CONFIG.instance().rangefinder.showBlockName)
             text = text.append(CommonComponents.NEW_LINE)
-                       .append(EyeSpyTexts.block(this.viewer.serverLevel().getBlockState(hit.getBlockPos())));
+                       .append(EyeSpyTexts.block(this.viewer.getLevel().getBlockState(hit.getBlockPos())));
 
         return text;
     }
