@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import red.jackf.eyespy.mixins.EyeSpyEntityInvoker;
 
 public class EyeSpyTexts {
     public static MutableComponent distance(ServerPlayer player, Vec3 target) {
@@ -23,9 +22,14 @@ public class EyeSpyTexts {
     }
 
     public static Component entity(Entity entity) {
-        Style style = EyeSpy.CONFIG.instance().rangefinder.useColours ?
-                Style.EMPTY.withColor(EyeSpyColours.getForEntity(entity)) : Style.EMPTY;
-        Component name = ((EyeSpyEntityInvoker) entity).eyespy$getTypeName().copy().setStyle(style);
+        boolean useColour = EyeSpy.CONFIG.instance().rangefinder.useColours;
+        Style style = useColour ? Style.EMPTY.withColor(EyeSpyColours.getForEntity(entity)) : Style.EMPTY;
+
+        if (entity instanceof ServerPlayer player) {
+            return useColour ? player.getDisplayName() : player.getName();
+        }
+
+        Component name = entity.getType().getDescription().copy().setStyle(style);
 
         if (entity.hasCustomName()) {
             name = Component.literal("").setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE))
