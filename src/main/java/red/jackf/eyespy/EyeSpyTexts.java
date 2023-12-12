@@ -15,14 +15,14 @@ public class EyeSpyTexts {
     }
 
     public static Component block(BlockState state) {
-        Style style = EyeSpy.CONFIG.instance().rangefinder.useColours ?
+        Style style = EyeSpy.CONFIG.instance().text.useColours ?
                 Style.EMPTY.withColor(EyeSpyColours.getForBlock(state).toARGB()) : Style.EMPTY;
 
         return state.getBlock().getName().setStyle(style);
     }
 
     public static Component entity(Entity entity) {
-        boolean useColour = EyeSpy.CONFIG.instance().rangefinder.useColours;
+        boolean useColour = EyeSpy.CONFIG.instance().text.useColours;
         Style style = useColour ? Style.EMPTY.withColor(EyeSpyColours.getForEntity(entity)) : Style.EMPTY;
 
         if (entity instanceof ServerPlayer player) {
