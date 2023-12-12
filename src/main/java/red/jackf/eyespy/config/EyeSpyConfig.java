@@ -10,11 +10,18 @@ import red.jackf.jackfredlib.api.config.Config;
 
 public class EyeSpyConfig implements Config<EyeSpyConfig> {
     @Comment("""
-                Maximum range that pings and rangefinding will function at. This is capped by the world / server's render
-                distance.
-                Range: [16, 384]
-                Default: 256""")
+            Maximum range that pings and rangefinding will function at. This is capped by the world / server's render
+            distance.
+            Range: [16, 384]
+            Default: 256""")
     public int maxRangeBlocks = 256;
+
+    @Comment("""
+            Whether raycasting for rangefinding and pings should load chunks if the target is unloaded. This may cause
+            additional lag.
+            Options: true, false
+            Default: true""")
+    public boolean loadChunks = false;
 
     @Comment("""
             Settings related to the pinging function added to spyglasses - to use, press the swap hands key,
