@@ -54,7 +54,7 @@ public class Raycasting {
         Vec3 from = player.getEyePosition();
         BlockPos pos = BlockPos.containing(to);
 
-        if (!EyeSpy.CONFIG.instance().loadChunks && !player.level().isLoaded(pos)) {
+        if (!EyeSpy.CONFIG.instance().loadChunks && !player.getLevel().isLoaded(pos)) {
             Vec3 offset = to.subtract(from);
             return BlockHitResult.miss(to, Direction.getNearest(offset.x, offset.y, offset.z), pos);
         }
