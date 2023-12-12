@@ -56,8 +56,8 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         @Comment("""
                 Whether to show description text (block and entity names) for pings.
                 Options: true, false
-                Default: true""")
-        public boolean showDescriptionText = true;
+                Default: false""")
+        public boolean showDescriptionText = false;
 
         @Comment("""
                 Whether to show distance text for pings.
