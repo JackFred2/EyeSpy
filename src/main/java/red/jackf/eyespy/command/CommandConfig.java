@@ -319,6 +319,12 @@ public class CommandConfig {
                                config -> config.maxRangeBlocks,
                                (config, newVal) -> config.maxRangeBlocks = newVal));
 
+        root.then(makeBoolean("loadChunks",
+                              "loadChunks",
+                              WikiPage.GLOBAL,
+                              config -> config.loadChunks,
+                              (config, newVal) -> config.loadChunks = newVal));
+
         root.then(makePingNode());
         root.then(makeRangefinderNode());
         root.then(makeTextNode());

@@ -1,6 +1,8 @@
 package red.jackf.eyespy.raycasting;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -50,6 +52,12 @@ public class Raycasting {
 
     public static BlockHitResult pick(ServerPlayer player, Vec3 to, boolean hitFluids) {
         Vec3 from = player.getEyePosition();
+        BlockPos pos = BlockPos.containing(to);
+
+        if (!EyeSpy.CONFIG.instance().loadChunks && !player.level().isLoaded(pos)) {
+            Vec3 offset = to.subtract(from);
+            return BlockHitResult.miss(to, Direction.getNearest(offset.x, offset.y, offset.z), pos);
+        }
 
         return player.getLevel().clip(new CustomClipContext(from, to, player, hitFluids));
     }

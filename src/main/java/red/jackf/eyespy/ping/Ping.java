@@ -32,6 +32,8 @@ public class Ping {
     public static void activate(ServerPlayer player) {
         EyeSpy.LOGGER.debug("Ping from {}", player.getName().getString());
 
+        long startTime = System.nanoTime();
+
         HitResult hit = Raycasting.cast(player);
 
         switch (hit.getType()) {
@@ -39,6 +41,8 @@ public class Ping {
             case BLOCK -> onBlock(player, (BlockHitResult) hit);
             case ENTITY -> onEntity(player, (EntityHitResult) hit);
         }
+
+        EyeSpy.LOGGER.debug("Time taken: {}ns", System.nanoTime() - startTime);
     }
 
     private static void onMiss(ServerPlayer player) {
