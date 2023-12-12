@@ -315,7 +315,7 @@ public class CommandConfig {
                                "maxRangeBlocks",
                                WikiPage.GLOBAL,
                                16,
-                               384,
+                               512,
                                config -> config.maxRangeBlocks,
                                (config, newVal) -> config.maxRangeBlocks = newVal));
 
