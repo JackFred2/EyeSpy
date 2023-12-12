@@ -79,12 +79,6 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         public boolean enabled = true;
 
         @Comment("""
-                Whether to use highlight colours for labels when looking at entities or blocks.
-                Options: true, false
-                Default: true""")
-        public boolean useColours = true;
-
-        @Comment("""
                 Whether to show the name of the block being looked at, if applicable.
                 Options: true, false
                 Default: true""")
@@ -95,6 +89,19 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
                 Options: true, false
                 Default: true""")
         public boolean showEntityName = true;
+    }
+
+    @Comment("""
+            Settings related to the text displayed by Eye Spy. This includes texts shown by pings when enabled, as well
+            as the rangefinder.""")
+    public Text text = new Text();
+
+    public static class Text {
+        @Comment("""
+                Whether to use highlight colours for labels when looking at entities or blocks.
+                Options: true, false
+                Default: true""")
+        public boolean useColours = true;
 
         @Comment("""
                 Modifier for the size of the rangefinder text.
@@ -109,7 +116,7 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         this.ping.notifyRangeBlocks = Mth.clamp(this.ping.notifyRangeBlocks, 8, 256);
         this.ping.lifetimeTicks = Mth.clamp(this.ping.lifetimeTicks, 60, 400);
         this.ping.maxPings = Mth.clamp(this.ping.maxPings, 1, 32);
-        this.rangefinder.textScale = Mth.clamp(this.rangefinder.textScale, 0.25f, 2f);
+        this.text.textScale = Mth.clamp(this.text.textScale, 0.25f, 2f);
     }
 
     @Override

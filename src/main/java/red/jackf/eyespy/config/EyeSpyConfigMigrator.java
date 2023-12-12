@@ -5,6 +5,7 @@ import red.jackf.jackfredlib.api.config.migration.MigratorBuilder;
 
 public interface EyeSpyConfigMigrator {
     static MigratorBuilder<EyeSpyConfig> get() {
-        return MigratorBuilder.forMod(EyeSpy.MODID);
+        return MigratorBuilder.<EyeSpyConfig>forMod(EyeSpy.MODID)
+                .addMigration("1.3.0", new MoveTextConfigOutOfRangefinder());
     }
 }

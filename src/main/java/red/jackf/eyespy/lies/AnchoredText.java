@@ -73,7 +73,7 @@ public abstract class AnchoredText {
     }
 
     private float getScale() {
-        return (this.viewer.getUseItem().is(Items.SPYGLASS) ? 0.020f : 0.2f) * maxDistanceFromPlayer * EyeSpy.CONFIG.instance().rangefinder.textScale;
+        return (this.viewer.getUseItem().is(Items.SPYGLASS) ? 0.020f : 0.2f) * maxDistanceFromPlayer * EyeSpy.CONFIG.instance().text.textScale;
     }
 
     private void refreshPosAndScale() {
