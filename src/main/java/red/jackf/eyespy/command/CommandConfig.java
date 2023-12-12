@@ -32,6 +32,7 @@ public class CommandConfig {
         String GLOBAL = "Home";
         String PING = "Ping";
         String RANGEFINDER = "Rangefinder";
+        String TEXT = "Text";
     }
 
     private static EyeSpyConfig getConfig() {
@@ -320,6 +321,7 @@ public class CommandConfig {
 
         root.then(makePingNode());
         root.then(makeRangefinderNode());
+        root.then(makeTextNode());
 
         return root;
     }
@@ -387,12 +389,6 @@ public class CommandConfig {
                               config -> config.rangefinder.enabled,
                               (config, newVal) -> config.rangefinder.enabled = newVal));
 
-        root.then(makeBoolean("useColours",
-                              "rangefinder.useColours",
-                              WikiPage.RANGEFINDER,
-                              config -> config.rangefinder.useColours,
-                              (config, newVal) -> config.rangefinder.useColours = newVal));
-
         root.then(makeBoolean("showBlockName",
                               "rangefinder.showBlockName",
                               WikiPage.RANGEFINDER,
@@ -405,12 +401,24 @@ public class CommandConfig {
                               config -> config.rangefinder.showEntityName,
                               (config, newVal) -> config.rangefinder.showEntityName = newVal));
 
+        return root;
+    }
+
+    private static ArgumentBuilder<CommandSourceStack, ?> makeTextNode() {
+        var root = Commands.literal("text");
+
+        root.then(makeBoolean("useColours",
+                              "text.useColours",
+                              WikiPage.TEXT,
+                              config -> config.text.useColours,
+                              (config, newVal) -> config.text.useColours = newVal));
+
         root.then(makeFloatRange("textScale",
-                                 "rangefinder.textScale",
-                                 WikiPage.RANGEFINDER,
+                                 "text.textScale",
+                                 WikiPage.TEXT,
                                  0.25f, 2f,
-                                 config -> config.rangefinder.textScale,
-                                 (config, newVal) -> config.rangefinder.textScale = newVal));
+                                 config -> config.text.textScale,
+                                 (config, newVal) -> config.text.textScale = newVal));
 
         return root;
     }
