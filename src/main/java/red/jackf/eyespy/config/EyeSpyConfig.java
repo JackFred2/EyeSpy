@@ -12,7 +12,7 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
     @Comment("""
             Maximum range that pings and rangefinding will function at. This is capped by the world / server's render
             distance.
-            Range: [16, 384]
+            Range: [16, 512]
             Default: 256""")
     public int maxRangeBlocks = 256;
 
@@ -20,7 +20,7 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
             Whether raycasting for rangefinding and pings should load chunks if the target is unloaded. This may cause
             additional lag.
             Options: true, false
-            Default: true""")
+            Default: false""")
     public boolean loadChunks = false;
 
     @Comment("""
@@ -119,7 +119,7 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
 
     @Override
     public void validate() {
-        this.maxRangeBlocks = Mth.clamp(this.maxRangeBlocks, 16, 384);
+        this.maxRangeBlocks = Mth.clamp(this.maxRangeBlocks, 16, 512);
         this.ping.notifyRangeBlocks = Mth.clamp(this.ping.notifyRangeBlocks, 8, 256);
         this.ping.lifetimeTicks = Mth.clamp(this.ping.lifetimeTicks, 60, 400);
         this.ping.maxPings = Mth.clamp(this.ping.maxPings, 1, 32);
