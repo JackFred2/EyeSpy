@@ -14,6 +14,7 @@ import red.jackf.eyespy.lies.AnchoredText;
 import java.util.function.Supplier;
 
 public class PingLieText extends AnchoredText {
+    private static final double MAX_CROSSHAIR_ANGLE = Math.PI / 12;
     private final Supplier<Vec3> posSupplier;
     private final Supplier<Component> textSuppler;
 
@@ -30,19 +31,24 @@ public class PingLieText extends AnchoredText {
     }
 
     private static Component getEntityText(ServerPlayer viewer, Entity entity) {
+        Vec3 target = entity.position();
+
+        if (!isCursorCloseTo(viewer, target)) return Component.empty();
+
         boolean distance = EyeSpy.CONFIG.instance().ping.showDistanceText;
         boolean description = EyeSpy.CONFIG.instance().ping.showDescriptionText;
+
         if (distance) {
             if (description) {
-                return EyeSpyTexts.distance(viewer, entity.position()).append(CommonComponents.NEW_LINE).append(EyeSpyTexts.entity(entity));
+                return EyeSpyTexts.distance(viewer, target).append(CommonComponents.NEW_LINE).append(EyeSpyTexts.entity(entity));
             } else {
-                return EyeSpyTexts.distance(viewer, entity.position());
+                return EyeSpyTexts.distance(viewer, target);
             }
         } else {
             if (description) {
                 return EyeSpyTexts.entity(entity);
             } else { // hopefully never happens but never know
-                return CommonComponents.EMPTY;
+                return Component.empty();
             }
         }
     }
@@ -54,21 +60,34 @@ public class PingLieText extends AnchoredText {
     }
 
     private static Component getBlockText(ServerPlayer viewer, BlockPos pos, BlockState state) {
+        Vec3 target = pos.getCenter();
+
+        if (!isCursorCloseTo(viewer, target)) return Component.empty();
+
         boolean distance = EyeSpy.CONFIG.instance().ping.showDistanceText;
         boolean description = EyeSpy.CONFIG.instance().ping.showDescriptionText;
+
         if (distance) {
             if (description) {
-                return EyeSpyTexts.distance(viewer, pos.getCenter()).append(CommonComponents.NEW_LINE).append(EyeSpyTexts.block(state));
+                return EyeSpyTexts.distance(viewer, target).append(CommonComponents.NEW_LINE).append(EyeSpyTexts.block(state));
             } else {
-                return EyeSpyTexts.distance(viewer, pos.getCenter());
+                return EyeSpyTexts.distance(viewer, target);
             }
         } else {
             if (description) {
                 return EyeSpyTexts.block(state);
             } else { // hopefully never happens but never know
-                return CommonComponents.EMPTY;
+                return Component.empty();
             }
         }
+    }
+
+    private static boolean isCursorCloseTo(ServerPlayer viewer, Vec3 target) {
+        Vec3 a = viewer.getLookAngle();
+        Vec3 b = target.subtract(viewer.getEyePosition()).normalize();
+        double angle = Math.acos(a.dot(b));
+
+        return angle < MAX_CROSSHAIR_ANGLE;
     }
 
     @Override
