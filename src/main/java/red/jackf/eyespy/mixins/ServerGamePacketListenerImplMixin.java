@@ -25,7 +25,7 @@ public abstract class ServerGamePacketListenerImplMixin {
     private void eyespy$handlePlayerSwap(ServerboundPlayerActionPacket packet, CallbackInfo ci) {
         if (EyeSpyNetworking.hasClientInstalled(player.getGameProfile())) return; // don't if they have dedicated keybind
 
-        if (Ping.canActivate(player)) {
+        if (Ping.canActivate(player, false)) {
             Ping.activate(player);
             ci.cancel();
         }

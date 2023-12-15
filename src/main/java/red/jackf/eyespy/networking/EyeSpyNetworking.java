@@ -32,7 +32,7 @@ public class EyeSpyNetworking {
         });
 
         ServerPlayNetworking.registerGlobalReceiver(C2SPing.TYPE, ((packet, player, sender) -> {
-            if (Ping.canActivate(player)) Ping.activate(player);
+            if (Ping.canActivate(player, true)) Ping.activate(player);
         }));
 
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> HAS_CLIENT_MOD_INSTALLED.remove(handler.getPlayer().getGameProfile()));

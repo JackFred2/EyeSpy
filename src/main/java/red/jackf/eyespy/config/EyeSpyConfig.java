@@ -2,11 +2,15 @@ package red.jackf.eyespy.config;
 
 import blue.endless.jankson.Comment;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 import red.jackf.eyespy.EyeSpy;
 import red.jackf.eyespy.networking.packets.S2CSettings;
 import red.jackf.jackfredlib.api.config.Config;
+
+import java.util.function.Predicate;
 
 public class EyeSpyConfig implements Config<EyeSpyConfig> {
     @Comment("""
@@ -36,11 +40,10 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         public boolean enabled = true;
 
         @Comment("""
-                Whether pinging functionality requires the player to be zoomed in (using the spyglass), or if just having
-                it in their hand will suffice.
-                Options: true, false
-                Default: true""")
-        public boolean requiresZoomIn = true;
+                What requirements there are to pinging with the spyglass. For more information, see the wikipage
+                Options: zoomed_with_spyglass, holding_spyglass, none
+                Default: zoomed_with_spyglass""")
+        public PingRequirement pingRequirement = PingRequirement.zoomed_with_spyglass;
 
         @Comment("""
                 Maximum range of nearby players that will recieve the ping highlight and sound.
@@ -84,6 +87,22 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
                 Options: [0, 1]
                 Default: 0.4""")
         public float minimumScale = 0.4f;
+
+        public enum PingRequirement {
+            zoomed_with_spyglass(player -> player.getUseItem().is(Items.SPYGLASS)),
+            holding_spyglass(player -> player.getMainHandItem().is(Items.SPYGLASS) || player.getOffhandItem().is(Items.SPYGLASS)),
+            none(player -> true);
+
+            private final Predicate<ServerPlayer> pingPredicate;
+
+            PingRequirement(Predicate<ServerPlayer> pingPredicate) {
+                this.pingPredicate = pingPredicate;
+            }
+
+            public boolean test(ServerPlayer player) {
+                return pingPredicate.test(player);
+            }
+        }
     }
 
     @Comment("""
