@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.FriendlyByteBuf;
 import red.jackf.eyespy.EyeSpy;
+import red.jackf.eyespy.config.EyeSpyConfig;
 
 /**
  * <p>Tells the client what the current server settings are; this is used for the toast saying how to use the mod.</p>
@@ -25,7 +26,7 @@ public record S2CSettings(boolean pingEnabled, boolean pingRequiresZoom) impleme
 
     public static S2CSettings create() {
         var config = EyeSpy.CONFIG.instance();
-        return new S2CSettings(config.ping.enabled, config.ping.requiresZoomIn);
+        return new S2CSettings(config.ping.enabled, config.ping.pingRequirement == EyeSpyConfig.Ping.PingRequirement.zoomed_with_spyglass);
     }
 
     @Override

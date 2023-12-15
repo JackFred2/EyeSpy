@@ -121,7 +121,7 @@ public class CommandConfig {
                                                                      }
                                                                  }
                                                        ));
-    }/*
+    }
 
     private static <E extends Enum<E>> LiteralArgumentBuilder<CommandSourceStack> makeEnum(String name,
                                                                                            String fullName,
@@ -169,7 +169,7 @@ public class CommandConfig {
         }
 
         return node;
-    }*/
+    }
 
     private static LiteralArgumentBuilder<CommandSourceStack> makeIntRange(String name,
                                                                            String fullName,
@@ -341,11 +341,12 @@ public class CommandConfig {
                               config -> config.ping.enabled,
                               (config, newVal) -> config.ping.enabled = newVal));
 
-        root.then(makeBoolean("requiresZoomIn",
-                              "ping.requiresZoomIn",
-                              WikiPage.PING,
-                              config -> config.ping.requiresZoomIn,
-                              (config, newVal) -> config.ping.requiresZoomIn = newVal));
+        root.then(makeEnum("pingRequirement",
+                           "ping.pingRequirement",
+                           WikiPage.PING,
+                           EyeSpyConfig.Ping.PingRequirement.class,
+                           config -> config.ping.pingRequirement,
+                           (config, newVal) -> config.ping.pingRequirement = newVal));
 
         root.then(makeIntRange("notifyRangeBlocks",
                                "ping.notifyRangeBlocks",
