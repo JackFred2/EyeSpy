@@ -131,7 +131,7 @@ public class CommandConfig {
                                                                                            BiConsumer<EyeSpyConfig, E> set) {
         var node = Commands.literal(name)
                            .executes(ctx -> {
-                               ctx.getSource().sendSuccess(() -> Formatting.infoLine(
+                               ctx.getSource().sendSuccess(Formatting.infoLine(
                                        translatable("eyespy.command.config.check",
                                                     makeHover(name, fullName, baseWikiPage),
                                                     Formatting.string(get.apply(getConfig()).name()))
@@ -155,7 +155,7 @@ public class CommandConfig {
                                   } else {
                                       set.accept(getConfig(), constant);
                                       verifySafeAndLoad();
-                                      ctx.getSource().sendSuccess(() -> Formatting.infoLine(
+                                      ctx.getSource().sendSuccess(Formatting.infoLine(
                                               translatable("eyespy.command.config.change",
                                                            makeHover(name, fullName, baseWikiPage),
                                                            Formatting.string(old.name()),

@@ -29,7 +29,7 @@ public class PingLieText extends AnchoredText {
         super(viewer, 4f, 0);
         this.posSupplier = posSupplier;
         this.textSuppler = textSuppler;
-        this.worldStartTime = viewer.level().getGameTime();
+        this.worldStartTime = viewer.getLevel().getGameTime();
     }
 
     protected PingLieText(ServerPlayer viewer, Entity entity, ServerPlayer pinger) {
@@ -77,7 +77,7 @@ public class PingLieText extends AnchoredText {
         float cursorFactor = (float) (Mth.clamp(angle - CROSSHAIR_SCALE_ANGLE, 0, MAX_CROSSHAIR_ANGLE) / MAX_CROSSHAIR_ANGLE);
         float cursorScale = Mth.lerp(cursorFactor, 1f, minScale);
 
-        long timeSinceStart = viewer.level().getGameTime() - worldStartTime;
+        long timeSinceStart = viewer.getLevel().getGameTime() - worldStartTime;
         float timeFactor = Mth.clamp(((float) timeSinceStart - FULLSIZE_PERIOD_TICKS) / FULLSIZE_SCALE_PERIOD, 0f, 1f);
         float timeScale = Mth.lerp(timeFactor, 1f, minScale);
 
