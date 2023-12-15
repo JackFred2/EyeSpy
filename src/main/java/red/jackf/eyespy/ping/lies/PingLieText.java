@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -15,13 +16,18 @@ import java.util.function.Supplier;
 
 public class PingLieText extends AnchoredText {
     private static final double MAX_CROSSHAIR_ANGLE = Math.PI / 12;
+    private static final double CROSSHAIR_SCALE_ANGLE = Math.PI / 16;
+    private static final long FULLSIZE_PERIOD_TICKS = 30;
+    private static final long FULLSIZE_SCALE_PERIOD = 10;
     private final Supplier<Vec3> posSupplier;
     private final Supplier<Component> textSuppler;
+    private final long worldStartTime;
 
     private PingLieText(ServerPlayer viewer, Supplier<Vec3> posSupplier, Supplier<Component> textSuppler) {
         super(viewer, 4f, 0);
         this.posSupplier = posSupplier;
         this.textSuppler = textSuppler;
+        this.worldStartTime = viewer.level().getGameTime();
     }
 
     protected PingLieText(ServerPlayer viewer, Entity entity) {
@@ -32,8 +38,6 @@ public class PingLieText extends AnchoredText {
 
     private static Component getEntityText(ServerPlayer viewer, Entity entity) {
         Vec3 target = entity.position();
-
-        if (!isCursorCloseTo(viewer, target)) return Component.empty();
 
         boolean distance = EyeSpy.CONFIG.instance().ping.showDistanceText;
         boolean description = EyeSpy.CONFIG.instance().ping.showDescriptionText;
@@ -62,8 +66,6 @@ public class PingLieText extends AnchoredText {
     private static Component getBlockText(ServerPlayer viewer, BlockPos pos, BlockState state) {
         Vec3 target = pos.getCenter();
 
-        if (!isCursorCloseTo(viewer, target)) return Component.empty();
-
         boolean distance = EyeSpy.CONFIG.instance().ping.showDistanceText;
         boolean description = EyeSpy.CONFIG.instance().ping.showDescriptionText;
 
@@ -82,12 +84,20 @@ public class PingLieText extends AnchoredText {
         }
     }
 
-    private static boolean isCursorCloseTo(ServerPlayer viewer, Vec3 target) {
+    protected float getScaleMultiplier() {
         Vec3 a = viewer.getLookAngle();
-        Vec3 b = target.subtract(viewer.getEyePosition()).normalize();
+        Vec3 b = getTargetPos().subtract(viewer.getEyePosition()).normalize();
         double angle = Math.acos(a.dot(b));
+        final float minScale = EyeSpy.CONFIG.instance().ping.minimumScale;
 
-        return angle < MAX_CROSSHAIR_ANGLE;
+        float cursorFactor = (float) (Mth.clamp(angle - CROSSHAIR_SCALE_ANGLE, 0, MAX_CROSSHAIR_ANGLE) / MAX_CROSSHAIR_ANGLE);
+        float cursorScale = Mth.lerp(cursorFactor, 1f, minScale);
+
+        long timeSinceStart = viewer.level().getGameTime() - worldStartTime;
+        float timeFactor = Mth.clamp(((float) timeSinceStart - FULLSIZE_PERIOD_TICKS) / FULLSIZE_SCALE_PERIOD, 0f, 1f);
+        float timeScale = Mth.lerp(timeFactor, 1f, minScale);
+
+        return Math.max(cursorScale, timeScale);
     }
 
     @Override
