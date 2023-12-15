@@ -71,6 +71,13 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
                 Options: true, false
                 Default: true""")
         public boolean showDistanceText = true;
+
+        @Comment("""
+                How small the ping text should scale down to when the player is looking away, as a factor of the full size.
+                See also: $.text.textScale.
+                Options: [0, 1]
+                Default: 0.4""")
+        public float minimumScale = 0.4f;
     }
 
     @Comment("""
@@ -123,6 +130,7 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         this.ping.notifyRangeBlocks = Mth.clamp(this.ping.notifyRangeBlocks, 8, 256);
         this.ping.lifetimeTicks = Mth.clamp(this.ping.lifetimeTicks, 60, 400);
         this.ping.maxPings = Mth.clamp(this.ping.maxPings, 1, 32);
+        this.ping.minimumScale = Mth.clamp(this.ping.minimumScale, 0, 1);
         this.text.textScale = Mth.clamp(this.text.textScale, 0.25f, 2f);
     }
 
