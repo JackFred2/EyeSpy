@@ -43,8 +43,8 @@ public class PingLieText extends AnchoredText {
 
         List<Component> lines = new ArrayList<>();
 
-        if (EyeSpy.CONFIG.instance().ping.showDistanceText) lines.add(EyeSpyTexts.entity(entity));
-        if (EyeSpy.CONFIG.instance().ping.showDescriptionText) lines.add(EyeSpyTexts.distance(viewer, target));
+        if (EyeSpy.CONFIG.instance().ping.showDistanceText) lines.add(EyeSpyTexts.distance(viewer, target));
+        if (EyeSpy.CONFIG.instance().ping.showDescriptionText) lines.add(EyeSpyTexts.entity(entity));
         if (EyeSpy.CONFIG.instance().ping.showPingerName) lines.add(pinger.getDisplayName());
 
         return joinLines(lines);
@@ -61,8 +61,8 @@ public class PingLieText extends AnchoredText {
 
         List<Component> lines = new ArrayList<>();
 
-        if (EyeSpy.CONFIG.instance().ping.showDistanceText) lines.add(EyeSpyTexts.block(state));
-        if (EyeSpy.CONFIG.instance().ping.showDescriptionText) lines.add(EyeSpyTexts.distance(viewer, target));
+        if (EyeSpy.CONFIG.instance().ping.showDistanceText) lines.add(EyeSpyTexts.distance(viewer, target));
+        if (EyeSpy.CONFIG.instance().ping.showDescriptionText) lines.add(EyeSpyTexts.block(state));
         if (EyeSpy.CONFIG.instance().ping.showPingerName) lines.add(pinger.getDisplayName());
 
         return joinLines(lines);
