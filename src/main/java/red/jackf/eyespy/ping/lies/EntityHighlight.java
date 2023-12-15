@@ -37,7 +37,7 @@ public final class EntityHighlight implements Highlight {
 
         if (Ping.pingTextEnabled())
             for (ServerPlayer viewer : viewers) {
-                texts.put(viewer, new PingLieText(viewer, entity));
+                texts.put(viewer, new PingLieText(viewer, entity, pinger));
             }
 
         this.refreshLifetime();
