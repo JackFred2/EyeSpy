@@ -4,13 +4,19 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.phys.*;
 import red.jackf.eyespy.EyeSpy;
 
 import java.util.Optional;
+import java.util.Set;
 
 public class Raycasting {
+    private static final Set<EntityType<?>> PINGABLE_OVERRIDE = Set.of(
+            EntityType.ITEM
+    );
+
     public static HitResult cast(ServerPlayer player) {
         Optional<EntityHitResult> entityOpt = tryEntity(player);
         BlockHitResult block = tryBlock(player);
@@ -42,7 +48,7 @@ public class Raycasting {
     }
 
     private static boolean isValidEntity(Entity entity, ServerPlayer player) {
-        return entity.isPickable() && !entity.isInvisibleTo(player);
+        return PINGABLE_OVERRIDE.contains(entity.getType()) || entity.isPickable() && !entity.isInvisibleTo(player);
     }
 
     private static BlockHitResult tryBlock(ServerPlayer player) {

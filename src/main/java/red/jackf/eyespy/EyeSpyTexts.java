@@ -6,6 +6,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -27,6 +28,8 @@ public class EyeSpyTexts {
 
         if (entity instanceof ServerPlayer player) {
             return useColour ? player.getDisplayName() : player.getName();
+        } else if (entity instanceof ItemEntity item) {
+            return Component.empty().append(item.getItem().getHoverName()).withStyle(item.getItem().getRarity().color);
         }
 
         Component name = entity.getType().getDescription().copy().setStyle(style);
