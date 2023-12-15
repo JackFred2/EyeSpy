@@ -3,11 +3,11 @@ package red.jackf.eyespy.ping;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import red.jackf.eyespy.EyeSpy;
+import red.jackf.eyespy.config.EyeSpyConfig;
 import red.jackf.eyespy.ping.lies.Constants;
 import red.jackf.eyespy.ping.lies.LieManager;
 import red.jackf.eyespy.raycasting.Raycasting;
@@ -20,13 +20,16 @@ public class Ping {
      * @param player Player trying to ping
      * @return Whether the pinger can ping at this time.
      */
-    public static boolean canActivate(ServerPlayer player) {
+    public static boolean canActivate(ServerPlayer player, boolean fromPacket) {
         if (!EyeSpy.CONFIG.instance().ping.enabled) return false;
-        if (EyeSpy.CONFIG.instance().ping.requiresZoomIn) {
-            return player.getUseItem().is(Items.SPYGLASS);
-        } else {
-            return player.getMainHandItem().is(Items.SPYGLASS) || player.getOffhandItem().is(Items.SPYGLASS);
-        }
+
+        var predicate = EyeSpy.CONFIG.instance().ping.pingRequirement;
+
+        // if it's not from a packet, require a spyglass to not override the swap hand
+        if (predicate == EyeSpyConfig.Ping.PingRequirement.none && !fromPacket)
+            predicate = EyeSpyConfig.Ping.PingRequirement.holding_spyglass;
+
+        return predicate.test(player);
     }
 
     public static void activate(ServerPlayer player) {
