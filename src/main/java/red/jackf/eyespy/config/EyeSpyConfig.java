@@ -49,7 +49,7 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         public int notifyRangeBlocks = 64;
 
         @Comment("""
-                Lifetime of ping highlights, in ticks.
+                Lifetime of ping highlights, in ticks (1 tick = 50ms).
                 Range: [60, 400] [3 seconds, 20 seconds]
                 Default: 160 (8 seconds)""")
         public int lifetimeTicks = 160;
