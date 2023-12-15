@@ -12,6 +12,8 @@ import red.jackf.eyespy.EyeSpy;
 import red.jackf.eyespy.EyeSpyTexts;
 import red.jackf.eyespy.lies.AnchoredText;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class PingLieText extends AnchoredText {
@@ -30,58 +32,40 @@ public class PingLieText extends AnchoredText {
         this.worldStartTime = viewer.level().getGameTime();
     }
 
-    protected PingLieText(ServerPlayer viewer, Entity entity) {
+    protected PingLieText(ServerPlayer viewer, Entity entity, ServerPlayer pinger) {
         this(viewer,
              () -> entity.position().add(0, entity.getBbHeight() + 0.5f, 0),
-             () -> getEntityText(viewer, entity));
+             () -> getEntityText(viewer, entity, pinger));
     }
 
-    private static Component getEntityText(ServerPlayer viewer, Entity entity) {
+    private static Component getEntityText(ServerPlayer viewer, Entity entity, ServerPlayer pinger) {
         Vec3 target = entity.position();
 
-        boolean distance = EyeSpy.CONFIG.instance().ping.showDistanceText;
-        boolean description = EyeSpy.CONFIG.instance().ping.showDescriptionText;
+        List<Component> lines = new ArrayList<>();
 
-        if (distance) {
-            if (description) {
-                return EyeSpyTexts.distance(viewer, target).append(CommonComponents.NEW_LINE).append(EyeSpyTexts.entity(entity));
-            } else {
-                return EyeSpyTexts.distance(viewer, target);
-            }
-        } else {
-            if (description) {
-                return EyeSpyTexts.entity(entity);
-            } else { // hopefully never happens but never know
-                return Component.empty();
-            }
-        }
+        if (EyeSpy.CONFIG.instance().ping.showDistanceText) lines.add(EyeSpyTexts.entity(entity));
+        if (EyeSpy.CONFIG.instance().ping.showDescriptionText) lines.add(EyeSpyTexts.distance(viewer, target));
+        if (EyeSpy.CONFIG.instance().ping.showPingerName) lines.add(pinger.getDisplayName());
+
+        return joinLines(lines);
     }
 
-    protected PingLieText(ServerPlayer viewer, BlockPos pos, BlockState state) {
+    protected PingLieText(ServerPlayer viewer, BlockPos pos, BlockState state, ServerPlayer pinger) {
         this(viewer,
              () -> pos.getCenter().add(0, 1f, 0),
-             () -> getBlockText(viewer, pos, state));
+             () -> getBlockText(viewer, pos, state, pinger));
     }
 
-    private static Component getBlockText(ServerPlayer viewer, BlockPos pos, BlockState state) {
+    private static Component getBlockText(ServerPlayer viewer, BlockPos pos, BlockState state, ServerPlayer pinger) {
         Vec3 target = pos.getCenter();
 
-        boolean distance = EyeSpy.CONFIG.instance().ping.showDistanceText;
-        boolean description = EyeSpy.CONFIG.instance().ping.showDescriptionText;
+        List<Component> lines = new ArrayList<>();
 
-        if (distance) {
-            if (description) {
-                return EyeSpyTexts.distance(viewer, target).append(CommonComponents.NEW_LINE).append(EyeSpyTexts.block(state));
-            } else {
-                return EyeSpyTexts.distance(viewer, target);
-            }
-        } else {
-            if (description) {
-                return EyeSpyTexts.block(state);
-            } else { // hopefully never happens but never know
-                return Component.empty();
-            }
-        }
+        if (EyeSpy.CONFIG.instance().ping.showDistanceText) lines.add(EyeSpyTexts.block(state));
+        if (EyeSpy.CONFIG.instance().ping.showDescriptionText) lines.add(EyeSpyTexts.distance(viewer, target));
+        if (EyeSpy.CONFIG.instance().ping.showPingerName) lines.add(pinger.getDisplayName());
+
+        return joinLines(lines);
     }
 
     protected float getScaleMultiplier() {
@@ -108,5 +92,16 @@ public class PingLieText extends AnchoredText {
     @Override
     protected Component getCurrentMessage() {
         return textSuppler.get();
+    }
+
+    private static Component joinLines(List<Component> parts) {
+        if (parts.isEmpty()) return Component.empty();
+        var base = Component.literal("");
+        for (int i = 0; i < parts.size(); i++) {
+            Component line = parts.get(i);
+            base.append(line);
+            if (i < parts.size() - 1) base.append(CommonComponents.NEW_LINE);
+        }
+        return base;
     }
 }
