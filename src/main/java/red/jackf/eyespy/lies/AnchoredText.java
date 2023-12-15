@@ -56,9 +56,22 @@ public abstract class AnchoredText {
         this.refreshPosAndScale();
     }
 
+    /**
+     * Position in the world the text is pretending to be at
+     */
     protected abstract Vec3 getTargetPos();
 
+    /**
+     * Current message displayed on the text
+     */
     protected abstract Component getCurrentMessage();
+
+    /**
+     * Scale multiplier for the text
+     */
+    protected float getScaleMultiplier() {
+        return 1f;
+    }
 
     public void stop() {
         this.lie.fade();
@@ -73,7 +86,7 @@ public abstract class AnchoredText {
     }
 
     private float getScale() {
-        return (this.viewer.getUseItem().is(Items.SPYGLASS) ? 0.020f : 0.2f) * maxDistanceFromPlayer * EyeSpy.CONFIG.instance().text.textScale;
+        return (this.viewer.getUseItem().is(Items.SPYGLASS) ? 0.020f : 0.2f) * maxDistanceFromPlayer * EyeSpy.CONFIG.instance().text.textScale * getScaleMultiplier();
     }
 
     private void refreshPosAndScale() {

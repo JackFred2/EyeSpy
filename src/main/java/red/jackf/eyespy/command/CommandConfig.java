@@ -383,6 +383,13 @@ public class CommandConfig {
                               config -> config.ping.showDistanceText,
                               (config, newVal) -> config.ping.showDistanceText = newVal));
 
+        root.then(makeFloatRange("minimumScale",
+                                 "ping.minimumScale",
+                                 WikiPage.PING,
+                                 0f, 1f,
+                                 config -> config.ping.minimumScale,
+                                 (config, newVal) -> config.ping.minimumScale = newVal));
+
         return root;
     }
 
