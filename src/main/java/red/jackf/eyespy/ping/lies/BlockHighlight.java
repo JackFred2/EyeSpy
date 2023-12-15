@@ -58,7 +58,7 @@ public final class BlockHighlight implements Highlight {
 
         if (Ping.pingTextEnabled())
             for (ServerPlayer viewer : viewers) {
-                texts.put(viewer, new PingLieText(viewer, pos, level.getBlockState(pos)));
+                texts.put(viewer, new PingLieText(viewer, pos, level.getBlockState(pos), pinger));
             }
 
         this.refreshLifetime();

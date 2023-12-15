@@ -73,6 +73,12 @@ public class EyeSpyConfig implements Config<EyeSpyConfig> {
         public boolean showDistanceText = true;
 
         @Comment("""
+                Whether to show the name of the player who caused the ping, on the text for pings.
+                Options: true, false
+                Default: true""")
+        public boolean showPingerName = true;
+
+        @Comment("""
                 How small the ping text should scale down to when the player is looking away, as a factor of the full size.
                 See also: $.text.textScale.
                 Options: [0, 1]
