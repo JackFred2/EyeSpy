@@ -9,7 +9,7 @@ on:
         required: false
         type: string
       lastTagOverride:
-        description: 'Previous tag for changelog generation'
+        description: 'Override previous tag for changelog generation'
         required: false
         type: string
       publishToModDistributors:
@@ -59,7 +59,7 @@ jobs:
       - name: Pull Mod Version
         id: pull-new-version
         run: |
-          grep 'module_version=' gradle.properties | sed 's/module_version=/new_tag=v/g' >> $GITHUB_OUTPUT
+          grep 'mod_version=' gradle.properties | sed 's/mod_version=/new_tag=v/g' >> $GITHUB_OUTPUT
 
       # previous tag parsing
       # we use an env variable here because it's easier than joining two step outputs I think
