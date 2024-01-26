@@ -282,7 +282,6 @@ if (canPublish) {
 		releaseAssets.from(
 			tasks["remapJar"].outputs.files,
 			tasks["remapSourcesJar"].outputs.files,
-			tasks["javadocJar"].outputs.files,
 		)
 		subprojects.forEach {
 			releaseAssets.from(
