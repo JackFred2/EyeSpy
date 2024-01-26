@@ -111,6 +111,7 @@ jobs:
           echo "NEW_TAG=$newTag" >> "$GITHUB_OUTPUT"
 
       - name: Check new version doesn't exist
+        if: ${{ github.event.inputs.createNewTag == 'true' }}
         run: |
           if git show-ref --tags --verify --quiet "refs/tags/${{ steps.new-tag-generator.outputs.NEW_TAG }}"; then
             echo "newTag already exists, failing"
