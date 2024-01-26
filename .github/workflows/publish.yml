@@ -90,8 +90,9 @@ jobs:
             exit 1
           fi
           echo "PREVIOUS_TAG=${{ inputs.lastTagOverride }}" >> "$GITHUB_ENV"
-      - name: Set previous tag from git history
-        if: ${{ inputs.lastTagOverride == null }}
+
+      - name: Set previous tag from git history (creating new tag)
+        if: ${{ inputs.lastTagOverride == null && inputs.createNewTag == true }}
         run: |
           previous=`git describe --tags --abbrev=0`
           if [ $previous ]; then
@@ -99,6 +100,16 @@ jobs:
           else
             echo "PREVIOUS_TAG=NONE" >> "$GITHUB_ENV"
           fi
+
+      - name: Set previous tag from git history (not creating new tag)
+        if: ${{ inputs.lastTagOverride == null && inputs.createNewTag == false }}
+        run: |
+          previous=`git describe --tags --abbrev=0 --exclude="$(git describe --abbrev=0 --tags)"`
+          if [ $previous ]; then
+            echo "PREVIOUS_TAG=$previous" >> "$GITHUB_ENV"
+          else
+            echo "PREVIOUS_TAG=NONE" >> "$GITHUB_ENV"
+          fi        
 
       # new tag parsing and concat
       # vX.Y.Z -> vX.Y.Z+1.20.4
@@ -111,7 +122,7 @@ jobs:
           echo "NEW_TAG=$newTag" >> "$GITHUB_OUTPUT"
 
       - name: Check new version doesn't exist
-        if: ${{ github.event.inputs.createNewTag == 'true' }}
+        if: ${{ inputs.createNewTag == 'true' }}
         run: |
           if git show-ref --tags --verify --quiet "refs/tags/${{ steps.new-tag-generator.outputs.NEW_TAG }}"; then
             echo "newTag already exists, failing"
@@ -130,7 +141,7 @@ jobs:
         run: ./gradlew check build
 
       - name: Create version tag
-        if: ${{ github.event.inputs.createNewTag == 'true' }}
+        if: ${{ inputs.createNewTag == 'true' }}
         uses: actions/github-script@v6
         with:
           script: |
@@ -142,11 +153,11 @@ jobs:
             })
 
       - name: Fetch new tag for changelog generation
-        if: ${{ github.event.inputs.createNewTag == 'true' }}
+        if: ${{ inputs.createNewTag == 'true' }}
         run: git fetch --tags
 
       - name: Publish to JackFred Maven
-        if: ${{ github.event.inputs.publishToMaven == 'true' }}
+        if: ${{ inputs.publishToMaven == 'true' }}
         run: ./gradlew generateChangelog publish -PchangelogHeaderAddon="${{ inputs.changelogHeader }}"
         env:
           RELEASE: true
@@ -156,7 +167,7 @@ jobs:
           JACKFRED_MAVEN_PASS: ${{ secrets.JACKFRED_MAVEN_PASS }}
 
       - name: Publish as GitHub Release
-        if: ${{ github.event.inputs.publishToGitHub == 'true' }}
+        if: ${{ inputs.publishToGitHub == 'true' }}
         run: ./gradlew generateChangelog githubRelease -PchangelogHeaderAddon="${{ inputs.changelogHeader }}"
         env:
           RELEASE: true
@@ -167,7 +178,7 @@ jobs:
 
       - name: Publish to Modrinth and Curseforge
         run: ./gradlew generateChangelog publishMods
-        if: ${{ github.event.inputs.publishToModDistributors == 'true' }}
+        if: ${{ inputs.publishToModDistributors == 'true' }}
         env:
           RELEASE: true
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
