@@ -22,7 +22,7 @@ public class EyeSpyClient implements ClientModInitializer {
     private static final KeyMapping PING = new KeyMapping("key.eyespy.ping", GLFW.GLFW_KEY_Z, "key.categories.multiplayer");
     private static final Function<EyeSpyConfig.Ping.PingRequirement, CustomToast> USAGE = zoomRequirement ->
             ToastBuilder.builder(ToastFormat.DARK, Component.translatable("eyespy.title"))
-                        .withImage(ImageSpec.modIcon("eyespy"))
+                        .withIcon(ToastIcon.modIcon("eyespy"))
                         .expiresAfter(3000L)
                         .progressShowsVisibleTime()
                         .addMessage(getToastText(zoomRequirement))
