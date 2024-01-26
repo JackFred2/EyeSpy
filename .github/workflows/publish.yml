@@ -9,11 +9,27 @@ on:
         required: false
         type: string
       lastTagOverride:
-        description: 'Override previous tag for changelog generation'
+        description: 'Override previous tag for changelog generation.'
         required: false
         type: string
+      createNewTag:
+        description: 'Create New Tag. May cause issues if below options are true and this is false.'
+        default: true
+        required: true
+        type: boolean
+      publishToMaven:
+        description: 'Publish to Maven'
+        default: true
+        required: true
+        type: boolean
+      publishToGitHub:
+        description: 'Publish as GitHub Release'
+        default: true
+        required: true
+        type: boolean
       publishToModDistributors:
         description: 'Publish to Modrinth and CurseForge'
+        default: false
         required: true
         type: boolean
 
@@ -109,7 +125,11 @@ jobs:
           echo "Previous: $PREVIOUS_TAG"
           echo "New: $NEW_TAG"
 
+      - name: build & run tests
+        run: ./gradlew check build
+
       - name: Create version tag
+        if: ${{ github.event.inputs.createNewTag == 'true' }}
         uses: actions/github-script@v6
         with:
           script: |
@@ -121,13 +141,22 @@ jobs:
             })
 
       - name: Fetch new tag for changelog generation
+        if: ${{ github.event.inputs.createNewTag == 'true' }}
         run: git fetch --tags
 
-      - name: build & run tests
-        run: ./gradlew check build
+      - name: Publish to JackFred Maven
+        if: ${{ github.event.inputs.publishToMaven == 'true' }}
+        run: ./gradlew generateChangelog publish -PchangelogHeaderAddon="${{ inputs.changelogHeader }}"
+        env:
+          RELEASE: true
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JACKFRED_MAVEN_USER: ${{ secrets.JACKFRED_MAVEN_USER }}
+          JACKFRED_MAVEN_PASS: ${{ secrets.JACKFRED_MAVEN_PASS }}
 
-      - name: Publish to JackFred Maven and GitHub Release
-        run: ./gradlew generateChangelog publish githubRelease -PchangelogHeaderAddon="${{ inputs.changelogHeader }}"
+      - name: Publish as GitHub Release
+        if: ${{ github.event.inputs.publishToGitHub == 'true' }}
+        run: ./gradlew generateChangelog githubRelease -PchangelogHeaderAddon="${{ inputs.changelogHeader }}"
         env:
           RELEASE: true
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
@@ -136,9 +165,10 @@ jobs:
           JACKFRED_MAVEN_PASS: ${{ secrets.JACKFRED_MAVEN_PASS }}
 
       - name: Publish to Modrinth and Curseforge
-        run: ./gradlew publishMods
+        run: ./gradlew generateChangelog publishMods
         if: ${{ github.event.inputs.publishToModDistributors == 'true' }}
         env:
+          RELEASE: true
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JACKFRED_MAVEN_USER: ${{ secrets.JACKFRED_MAVEN_USER }}
