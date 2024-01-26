@@ -122,7 +122,7 @@ jobs:
           echo "NEW_TAG=$newTag" >> "$GITHUB_OUTPUT"
 
       - name: Check new version doesn't exist
-        if: ${{ inputs.createNewTag == 'true' }}
+        if: ${{ inputs.createNewTag == true }}
         run: |
           if git show-ref --tags --verify --quiet "refs/tags/${{ steps.new-tag-generator.outputs.NEW_TAG }}"; then
             echo "newTag already exists, failing"
@@ -141,7 +141,7 @@ jobs:
         run: ./gradlew check build
 
       - name: Create version tag
-        if: ${{ inputs.createNewTag == 'true' }}
+        if: ${{ inputs.createNewTag == true }}
         uses: actions/github-script@v6
         with:
           script: |
@@ -153,11 +153,11 @@ jobs:
             })
 
       - name: Fetch new tag for changelog generation
-        if: ${{ inputs.createNewTag == 'true' }}
+        if: ${{ inputs.createNewTag == true }}
         run: git fetch --tags
 
       - name: Publish to JackFred Maven
-        if: ${{ inputs.publishToMaven == 'true' }}
+        if: ${{ inputs.publishToMaven == true }}
         run: ./gradlew generateChangelog publish -PchangelogHeaderAddon="${{ inputs.changelogHeader }}"
         env:
           RELEASE: true
@@ -167,7 +167,7 @@ jobs:
           JACKFRED_MAVEN_PASS: ${{ secrets.JACKFRED_MAVEN_PASS }}
 
       - name: Publish as GitHub Release
-        if: ${{ inputs.publishToGitHub == 'true' }}
+        if: ${{ inputs.publishToGitHub == true }}
         run: ./gradlew generateChangelog githubRelease -PchangelogHeaderAddon="${{ inputs.changelogHeader }}"
         env:
           RELEASE: true
@@ -178,7 +178,7 @@ jobs:
 
       - name: Publish to Modrinth and Curseforge
         run: ./gradlew generateChangelog publishMods
-        if: ${{ inputs.publishToModDistributors == 'true' }}
+        if: ${{ inputs.publishToModDistributors == true }}
         env:
           RELEASE: true
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
