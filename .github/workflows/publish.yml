@@ -1,5 +1,5 @@
 name: Publish
-run-name: Publish JFLib
+run-name: Publish Eye Spy
 
 on:
   workflow_dispatch:
