@@ -29,7 +29,7 @@ public class EyeSpyTexts {
         if (entity instanceof ServerPlayer player) {
             return useColour ? player.getDisplayName() : player.getName();
         } else if (entity instanceof ItemEntity item) {
-            return Component.empty().append(item.getItem().getHoverName()).withStyle(item.getItem().getRarity().color);
+            return Component.empty().append(item.getItem().getHoverName()).withStyle(item.getItem().getRarity().color());
         }
 
         Component name = entity.getType().getDescription().copy().setStyle(style);

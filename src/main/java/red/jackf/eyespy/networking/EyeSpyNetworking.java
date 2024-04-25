@@ -1,6 +1,7 @@
 package red.jackf.eyespy.networking;
 
 import com.mojang.authlib.GameProfile;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,14 +26,18 @@ public class EyeSpyNetworking {
     }
 
     public static void setup() {
-        ServerPlayNetworking.registerGlobalReceiver(C2SHasClientModInstalled.TYPE, (packet, player, sender) -> {
-            EyeSpy.LOGGER.debug("{} has client mod installed, not using swap items override", player.getName().getString());
-            HAS_CLIENT_MOD_INSTALLED.add(player.getGameProfile());
-            sendSettings(player);
+        PayloadTypeRegistry.playC2S().register(C2SHasClientModInstalled.TYPE, C2SHasClientModInstalled.CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SPing.TYPE, C2SPing.CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CSettings.TYPE, S2CSettings.CODEC);
+
+        ServerPlayNetworking.registerGlobalReceiver(C2SHasClientModInstalled.TYPE, (packet, context) -> {
+            EyeSpy.LOGGER.debug("{} has client mod installed, not using swap items override", context.player().getName().getString());
+            HAS_CLIENT_MOD_INSTALLED.add(context.player().getGameProfile());
+            sendSettings(context.player());
         });
 
-        ServerPlayNetworking.registerGlobalReceiver(C2SPing.TYPE, ((packet, player, sender) -> {
-            if (Ping.canActivate(player, true)) Ping.activate(player);
+        ServerPlayNetworking.registerGlobalReceiver(C2SPing.TYPE, ((packet, context) -> {
+            if (Ping.canActivate(context.player(), true)) Ping.activate(context.player());
         }));
 
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> HAS_CLIENT_MOD_INSTALLED.remove(handler.getOwner()));

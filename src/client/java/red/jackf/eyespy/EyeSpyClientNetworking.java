@@ -9,8 +9,8 @@ public class EyeSpyClientNetworking {
     public static void setup() {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             if (ClientPlayNetworking.canSend(C2SHasClientModInstalled.TYPE)) {
-                ClientPlayNetworking.registerReceiver(S2CSettings.TYPE, ((packet, player, responseSender) -> EyeSpyClient.lastSettings = packet));
-                sender.sendPacket(new C2SHasClientModInstalled());
+                ClientPlayNetworking.registerReceiver(S2CSettings.TYPE, ((packet, context) -> EyeSpyClient.lastSettings = packet));
+                sender.sendPacket(C2SHasClientModInstalled.INSTANCE);
             }
         });
     }

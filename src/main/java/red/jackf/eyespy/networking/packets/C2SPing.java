@@ -1,8 +1,9 @@
 package red.jackf.eyespy.networking.packets;
 
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import org.jetbrains.annotations.NotNull;
 import red.jackf.eyespy.EyeSpy;
 
 /**
@@ -10,18 +11,17 @@ import red.jackf.eyespy.EyeSpy;
  *
  * <p>Nothing in buffer</p>
  */
-public record C2SPing() implements FabricPacket {
-    public static PacketType<C2SPing> TYPE = PacketType.create(EyeSpy.id("ping"), C2SPing::new);
+public final class C2SPing implements CustomPacketPayload {
+    public static final C2SPing INSTANCE = new C2SPing();
 
-    public C2SPing(FriendlyByteBuf buf) {
-        this();
+    public static final Type<C2SPing> TYPE = new Type<>(EyeSpy.id("ping"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, C2SPing> CODEC = StreamCodec.unit(INSTANCE);
+
+    private C2SPing() {
     }
 
     @Override
-    public void write(FriendlyByteBuf buf) {}
-
-    @Override
-    public PacketType<?> getType() {
+    public @NotNull Type<C2SPing> type() {
         return TYPE;
     }
 }

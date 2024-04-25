@@ -55,15 +55,15 @@ public class EyeSpyClient implements ClientModInitializer {
             var connection = client.getConnection();
             if (connection != null && ClientPlayNetworking.canSend(C2SPing.TYPE)) {
                 while (PING.consumeClick()) {
-                    ClientPlayNetworking.send(new C2SPing());
+                    ClientPlayNetworking.send(C2SPing.INSTANCE);
                 }
 
-                if (!shownToast && client.player != null && lastSettings != null && lastSettings.pingEnabled) {
-                    if (lastSettings.pingRequirement == EyeSpyConfig.Ping.PingRequirement.none
+                if (!shownToast && client.player != null && lastSettings != null && lastSettings.pingEnabled()) {
+                    if (lastSettings.pingRequirement() == EyeSpyConfig.Ping.PingRequirement.none
                             || client.player.getMainHandItem().is(Items.SPYGLASS)
                             || client.player.getOffhandItem().is(Items.SPYGLASS)) {
                         shownToast = true;
-                        Toasts.INSTANCE.send(USAGE.apply(lastSettings.pingRequirement));
+                        Toasts.INSTANCE.send(USAGE.apply(lastSettings.pingRequirement()));
                     }
                 }
             }

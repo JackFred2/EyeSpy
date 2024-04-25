@@ -1,8 +1,9 @@
 package red.jackf.eyespy.networking.packets;
 
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import org.jetbrains.annotations.NotNull;
 import red.jackf.eyespy.EyeSpy;
 
 /**
@@ -10,18 +11,17 @@ import red.jackf.eyespy.EyeSpy;
  *
  * <p>Nothing in the buffer.</p>
  */
-public record C2SHasClientModInstalled() implements FabricPacket {
-    public static final PacketType<C2SHasClientModInstalled> TYPE = PacketType.create(EyeSpy.id("has_client_mod_installed"), C2SHasClientModInstalled::new);
+public final class C2SHasClientModInstalled implements CustomPacketPayload {
+    public static final C2SHasClientModInstalled INSTANCE = new C2SHasClientModInstalled();
 
-    public C2SHasClientModInstalled(FriendlyByteBuf buf) {
-        this();
+    public static final Type<C2SHasClientModInstalled> TYPE = new Type<>(EyeSpy.id("has_client_mod_installed"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, C2SHasClientModInstalled> CODEC = StreamCodec.unit(INSTANCE);
+
+    private C2SHasClientModInstalled() {
     }
 
     @Override
-    public void write(FriendlyByteBuf buf) {}
-
-    @Override
-    public PacketType<?> getType() {
+    public @NotNull Type<C2SHasClientModInstalled> type() {
         return TYPE;
     }
 }
