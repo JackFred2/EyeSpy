@@ -30,7 +30,7 @@ public class EyeSpy implements ModInitializer {
 			.build();
 
 	public static ResourceLocation id(String path) {
-		return new ResourceLocation(MODID, path);
+		return ResourceLocation.fromNamespaceAndPath(MODID, path);
 	}
 
 	private static @Nullable MinecraftServer server = null;
