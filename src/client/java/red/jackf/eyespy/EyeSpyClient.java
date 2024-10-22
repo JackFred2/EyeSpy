@@ -33,7 +33,7 @@ public class EyeSpyClient implements ClientModInitializer {
 
     private static Component getToastText(EyeSpyConfig.Ping.PingRequirement requirement) {
         Component key = PING.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.AQUA);
-        Component spyglassName = Items.SPYGLASS.getDescription();
+        Component spyglassName = Items.SPYGLASS.getName();
         return switch (requirement) {
             case zoomed_with_spyglass -> Component.translatable("eyespy.toast.ping.withZoom", key, spyglassName);
             case holding_spyglass -> Component.translatable("eyespy.toast.ping.noZoom", key, spyglassName);

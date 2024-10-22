@@ -2,8 +2,7 @@ package red.jackf.eyespy.rangefinding;
 
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Items;
 import red.jackf.eyespy.EyeSpy;
 
@@ -15,7 +14,7 @@ public class Rangefinder {
                     && player.getItemInHand(hand).is(Items.SPYGLASS)) {
                 add(serverPlayer);
             }
-            return InteractionResultHolder.pass(ItemStack.EMPTY);
+            return InteractionResult.PASS;
         });
     }
 
