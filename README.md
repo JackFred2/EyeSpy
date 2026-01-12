@@ -1,3 +1,7 @@
+# Archived
+
+Eye Spy has been organised so I can stay focused on a smaller amount of mods for now. It was mainly intended to test a server-side library I was working on, and will need a basic full rewrite to bring to modern versions, ideally with Polymer as a backend instead.
+
 # Eye Spy
 
 Server-sided ping and rangefinding functionality for the Spyglass, targeting Fabric & Quilt.
